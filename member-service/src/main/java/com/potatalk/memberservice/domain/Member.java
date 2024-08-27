@@ -1,6 +1,8 @@
 package com.potatalk.memberservice.domain;
 
 import com.potatalk.memberservice.dto.MemberCreateDto;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -9,11 +11,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Table("members")
 @Getter
-@NoArgsConstructor()
+@NoArgsConstructor
 public class Member {
 
     @Id
-    private String id;
+    private Long id;
 
     private String username;
 
