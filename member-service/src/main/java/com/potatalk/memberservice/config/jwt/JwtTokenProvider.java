@@ -82,17 +82,19 @@ public class JwtTokenProvider {
             .getSubject();
     }
 
-    public String createToken(String email) {
-        Date expireDate = createExpireDate(TOKEN_TIME);
+    public Mono<String> createToken(String email) {
+        return Mono.fromCallable(() -> {
+            Date expireDate = createExpireDate(TOKEN_TIME);
 
-        return BEARER_PREFIX +
-            Jwts.builder()
-                .setSubject(email)
-                .claim(AUTHORIZATION_KEY, null)
-                .setExpiration(expireDate)
-                .setIssuedAt(new Date())
-                .signWith(key, signatureAlgorithm)
-                .compact();
+            return BEARER_PREFIX +
+                Jwts.builder()
+                    .setSubject(email)
+                    .claim(AUTHORIZATION_KEY, null)
+                    .setExpiration(expireDate)
+                    .setIssuedAt(new Date())
+                    .signWith(key, signatureAlgorithm)
+                    .compact();
+        });
     }
 
     private Date createExpireDate(long expireDate) {

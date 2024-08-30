@@ -1,10 +1,15 @@
 package com.potatalk.memberservice.controller;
 
-import com.potatalk.memberservice.dto.MemberCreateDto;
+import com.potatalk.memberservice.config.jwt.JwtTokenProvider;
+import com.potatalk.memberservice.dto.SignInDto;
+import com.potatalk.memberservice.dto.SingUpDto;
 import com.potatalk.memberservice.dto.MemberRes;
 import com.potatalk.memberservice.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +24,18 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @PostMapping
-    public Mono<MemberRes> createMember(@RequestBody MemberCreateDto memberCreateDto) {
-        return memberService.createMember(memberCreateDto);
+    @PostMapping("/signup")
+    public Mono<ResponseEntity<MemberRes>> createMember(@RequestBody SingUpDto memberCreateDto) {
+        return memberService.createMember(memberCreateDto)
+            .map(memberRes -> ResponseEntity.status(HttpStatus.CREATED).body(memberRes));
+    }
+
+    @PostMapping("/signin")
+    public Mono<ResponseEntity<Void>> login(@RequestBody SignInDto signInDto) {
+        return memberService.signIn(signInDto)
+            .map(token -> ResponseEntity
+                .ok()
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .build());
     }
 }
