@@ -1,10 +1,10 @@
 package com.potatalk.memberservice.domain;
 
-import com.potatalk.memberservice.dto.MemberCreateDto;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import com.potatalk.memberservice.dto.SignInDto;
+import com.potatalk.memberservice.dto.SingUpDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Table("members")
 @Getter
 @NoArgsConstructor
+@Slf4j
 public class Member {
 
     @Id
@@ -27,13 +28,18 @@ public class Member {
     @Column("nick_name")
     private String nickName;
 
-    private Member(MemberCreateDto memberCreateDto, PasswordEncoder passwordEncoder) {
-        this.username = memberCreateDto.getUsername();
-        this.password = passwordEncoder.encode(memberCreateDto.getPassword());
-        this.nickName = memberCreateDto.getNickName();
+    private Member(SingUpDto singUpDto, PasswordEncoder passwordEncoder) {
+        this.username = singUpDto.getUsername();
+        this.password = passwordEncoder.encode(singUpDto.getPassword());
+        this.nickName = singUpDto.getNickName();
     }
 
-    public static Member createMember(MemberCreateDto memberCreateDto, PasswordEncoder passwordEncoder) {
-        return new Member(memberCreateDto, passwordEncoder);
+    public static Member createMember(SingUpDto singUpDto, PasswordEncoder passwordEncoder) {
+        return new Member(singUpDto, passwordEncoder);
+    }
+
+    public boolean passwordMatch(final String password,
+        final PasswordEncoder passwordEncoder) {
+        return passwordEncoder.matches(password, this.password);
     }
 }
