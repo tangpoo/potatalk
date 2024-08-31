@@ -1,6 +1,7 @@
 package com.potatalk.memberservice.controller;
 
 import com.potatalk.memberservice.config.jwt.JwtTokenProvider;
+import com.potatalk.memberservice.dto.MemberUpdateDto;
 import com.potatalk.memberservice.dto.SignInDto;
 import com.potatalk.memberservice.dto.SingUpDto;
 import com.potatalk.memberservice.dto.MemberRes;
@@ -10,7 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,5 +42,24 @@ public class MemberController {
                 .ok()
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .build());
+    }
+
+    @PutMapping
+    public Mono<ResponseEntity<MemberRes>> updateMember(
+        @RequestBody MemberUpdateDto memberUpdateDto,
+        @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return memberService.updateMember(memberUpdateDto, userDetails.getUsername())
+            .map(res -> ResponseEntity
+                .ok()
+                .body(res)
+            );
+    }
+
+    @DeleteMapping
+    public Mono<ResponseEntity<Void>> deleteMember(@AuthenticationPrincipal UserDetails userDetails) {
+        memberService.deleteMember(userDetails.getUsername());
+
+        return Mono.just(ResponseEntity.noContent().build());
     }
 }

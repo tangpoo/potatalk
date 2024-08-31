@@ -2,11 +2,14 @@ package com.potatalk.memberservice.service;
 
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.isA;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.potatalk.memberservice.config.jwt.JwtTokenProvider;
 import com.potatalk.memberservice.domain.Member;
 import com.potatalk.memberservice.dto.MemberRes;
+import com.potatalk.memberservice.dto.MemberUpdateDto;
 import com.potatalk.memberservice.dto.SignInDto;
 import com.potatalk.memberservice.dto.SingUpDto;
 import com.potatalk.memberservice.repository.MemberRepository;
@@ -40,7 +43,7 @@ public class MemberServiceTests {
     private BCryptPasswordEncoder passwordEncoder;
 
     @Nested
-    class createMember {
+    class create_member {
 
         @Test
         void success() {
@@ -56,7 +59,7 @@ public class MemberServiceTests {
 
             // Assert
             StepVerifier.create(result)
-                .expectNextMatches(memberRes -> memberRes.getUsername().equals("username-1234"))
+                .expectNextMatches(memberRes -> memberRes.getUsername().equals(request.getUsername()))
                 .verifyComplete();
 
         }
@@ -88,8 +91,6 @@ public class MemberServiceTests {
         void not_found_member() {
             // Arrange
             final SignInDto signInDto = new SignInDto("username-1234", "password-1234");
-            final Member member = MemberSteps.createMember();
-            String token = "token-1234";
 
             when(memberRepository.findByUsername(anyString())).thenReturn(Mono.empty());
 
@@ -118,5 +119,41 @@ public class MemberServiceTests {
         }
     }
 
+    @Test
+    void update_member_success() {
+        // Arrange
+        final String username = "username-1234";
+        final MemberUpdateDto memberUpdateDto = new MemberUpdateDto("username-4321",
+            "nickName-4321");
+        final Member member = MemberSteps.createMember();
+
+        when(memberRepository.findByUsername(anyString())).thenReturn(Mono.just(member));
+
+        // Act
+        final Mono<MemberRes> result = memberService.updateMember(memberUpdateDto,
+            username);
+
+        // Assert
+        StepVerifier.create(result)
+            .expectNextMatches(res ->
+                res.getUsername().equals(memberUpdateDto.getUsername()) &&
+                    res.getNickName().equals(memberUpdateDto.getNickName())
+            )
+            .verifyComplete();
+    }
+
+    @Test
+    void delete_member_success() {
+        // Arrange
+        String username = "username-1234";
+        Member member = MemberSteps.createMember();
+
+        when(memberRepository.findByUsername(anyString())).thenReturn(Mono.just(member));
+        // Act
+        memberService.deleteMember(username);
+
+        // Assert
+        verify(memberRepository, times(1)).delete(member);
+    }
 
 }
