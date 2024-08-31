@@ -1,7 +1,9 @@
 package com.potatalk.memberservice.service;
 
+import brave.internal.collect.UnsafeArrayMap.Mapper;
 import com.potatalk.memberservice.config.jwt.JwtTokenProvider;
 import com.potatalk.memberservice.domain.Member;
+import com.potatalk.memberservice.dto.MemberUpdateDto;
 import com.potatalk.memberservice.dto.SignInDto;
 import com.potatalk.memberservice.dto.SingUpDto;
 import com.potatalk.memberservice.dto.MemberRes;
@@ -35,6 +37,22 @@ public class MemberService {
             .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
             .flatMap(member -> MemberValidator.validatePassword(member, signInDto.getPassword(), passwordEncoder))
             .flatMap(member -> jwtTokenProvider.createToken(member.getUsername()));
+    }
+
+    public Mono<MemberRes> updateMember(final MemberUpdateDto memberUpdateDto, final String username) {
+        return memberRepository.
+            findByUsername(username)
+            .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
+            .flatMap(member -> member.update(memberUpdateDto))
+            .flatMap(MemberRes::from);
+    }
+
+    public void deleteMember(final String username) {
+        memberRepository
+            .findByUsername(username)
+            .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
+            .doOnSuccess(memberRepository::delete)
+            .subscribe();
     }
 
     private static class MemberValidator {
