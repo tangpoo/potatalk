@@ -17,4 +17,14 @@ public class MemberSteps {
 
         return Member.createMember(request, passwordEncoder);
     }
+
+    public static Member createMemberWithUsername(String username) {
+        final SingUpDto request = new SingUpDto(
+            username,
+            "password-1234",
+            "nickName-1234"
+        );
+
+        return Member.createMember(request, passwordEncoder);
+    }
 }

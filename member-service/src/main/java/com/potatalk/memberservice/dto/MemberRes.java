@@ -15,10 +15,10 @@ public class MemberRes {
 
     private String nickName;
 
-    public static Mono<MemberRes> from(Member member) {
-        return Mono.just(new MemberRes(
+    public static MemberRes from(Member member) {
+        return new MemberRes(
             member.getUsername(),
             member.getNickName()
-        ));
+        );
     }
 }
