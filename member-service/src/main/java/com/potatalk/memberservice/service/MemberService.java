@@ -1,12 +1,13 @@
 package com.potatalk.memberservice.service;
 
-import brave.internal.collect.UnsafeArrayMap.Mapper;
 import com.potatalk.memberservice.config.jwt.JwtTokenProvider;
+import com.potatalk.memberservice.domain.Friend;
 import com.potatalk.memberservice.domain.Member;
+import com.potatalk.memberservice.dto.MemberRes;
 import com.potatalk.memberservice.dto.MemberUpdateDto;
 import com.potatalk.memberservice.dto.SignInDto;
 import com.potatalk.memberservice.dto.SingUpDto;
-import com.potatalk.memberservice.dto.MemberRes;
+import com.potatalk.memberservice.repository.FriendRepository;
 import com.potatalk.memberservice.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import reactor.core.publisher.Mono;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final FriendRepository friendRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -35,15 +37,18 @@ public class MemberService {
         return memberRepository
             .findByUsername(signInDto.getUsername())
             .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
-            .flatMap(member -> MemberValidator.validatePassword(member, signInDto.getPassword(), passwordEncoder))
+            .flatMap(member -> MemberValidator.validatePassword(member, signInDto.getPassword(),
+                passwordEncoder))
             .flatMap(member -> jwtTokenProvider.createToken(member.getUsername()));
     }
 
-    public Mono<MemberRes> updateMember(final MemberUpdateDto memberUpdateDto, final String username) {
+    public Mono<MemberRes> updateMember(final MemberUpdateDto memberUpdateDto,
+        final String username) {
         return memberRepository.
             findByUsername(username)
             .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
             .flatMap(member -> member.update(memberUpdateDto))
+            .flatMap(memberRepository::save)
             .flatMap(MemberRes::from);
     }
 
@@ -55,9 +60,34 @@ public class MemberService {
             .subscribe();
     }
 
+    public Mono<MemberRes> findMember(final Long memberId) {
+        return memberRepository
+            .findById(memberId)
+            .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
+            .flatMap(MemberRes::from);
+    }
+
+    public void friendRequest(String username, final Long friendId) {
+        memberRepository
+            .findByUsername(username)
+            .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
+            .flatMap(member ->
+                memberRepository.existsById(friendId)
+                    .flatMap(friendExists -> {
+                        if (!friendExists) {
+                            return Mono.error(new IllegalArgumentException("friend not found"));
+                        }
+                        final Friend friend = Friend.create(member.getId(), friendId);
+                        return friendRepository.save(friend);
+                    })
+            )
+            .subscribe();
+    }
+
     private static class MemberValidator {
 
-        public static Mono<Member> validatePassword(Member member, String password, PasswordEncoder passwordEncoder) {
+        public static Mono<Member> validatePassword(Member member, String password,
+            PasswordEncoder passwordEncoder) {
             return member.passwordMatch(password, passwordEncoder)
                 ? Mono.just(member)
                 : Mono.error(new AccessDeniedException("패스워드가 일치하지 않습니다."));

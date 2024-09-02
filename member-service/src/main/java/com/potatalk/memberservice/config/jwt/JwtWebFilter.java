@@ -18,11 +18,11 @@ public class JwtWebFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(final ServerWebExchange exchange, final WebFilterChain chain) {
-        String requestPath = exchange.getRequest().getURI().getPath();
-
-        if(isPermitAllPath(requestPath)) {
-            return chain.filter(exchange);
-        }
+//        String requestPath = exchange.getRequest().getURI().getPath();
+//
+//        if(isPermitAllPath(requestPath)) {
+//            return chain.filter(exchange);
+//        }
 
         String token = jwtTokenProvider.getTokenFromHeader(exchange.getRequest());
 
