@@ -92,8 +92,7 @@ public class MemberService {
                 friendRepository.findAllFriendsByMemberId(member.getId())
                     .map(friend -> friend.getMemberId().equals(member.getId()) ? friend.getFriendId() : friend.getMemberId())
                     .collectList()
-                    .flatMapMany(memberRepository::findAllById
-                    )
+                    .flatMapMany(memberRepository::findAllById)
                     .map(MemberRes::from)
             );
     }
