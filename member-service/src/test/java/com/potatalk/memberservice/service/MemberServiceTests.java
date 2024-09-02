@@ -1,5 +1,6 @@
 package com.potatalk.memberservice.service;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.isA;
 import static org.mockito.Mockito.times;
@@ -7,11 +8,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.potatalk.memberservice.config.jwt.JwtTokenProvider;
+import com.potatalk.memberservice.domain.Friend;
 import com.potatalk.memberservice.domain.Member;
 import com.potatalk.memberservice.dto.MemberRes;
 import com.potatalk.memberservice.dto.MemberUpdateDto;
 import com.potatalk.memberservice.dto.SignInDto;
 import com.potatalk.memberservice.dto.SingUpDto;
+import com.potatalk.memberservice.repository.FriendRepository;
 import com.potatalk.memberservice.repository.MemberRepository;
 import com.potatalk.memberservice.steps.MemberSteps;
 import org.junit.jupiter.api.Nested;
@@ -35,6 +38,9 @@ public class MemberServiceTests {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private FriendRepository friendRepository;
 
     @Mock
     private JwtTokenProvider jwtTokenProvider;
@@ -154,6 +160,51 @@ public class MemberServiceTests {
 
         // Assert
         verify(memberRepository, times(1)).delete(member);
+    }
+
+    @Nested
+    class friend_request {
+
+        @Test
+        void success() {
+            // Arrange
+            String username = "username-1234";
+            Long friendId = 1L;
+            Long memberId = 2L;
+            final Friend friend = Friend.create(memberId, friendId);
+            final Member member = MemberSteps.createMember();
+
+            when(memberRepository.findByUsername(username)).thenReturn(Mono.just(member));
+            when(memberRepository.existsById(friendId)).thenReturn(Mono.just(true));
+            when(friendRepository.save(any(Friend.class))).thenReturn(Mono.just(friend));
+
+            // Act
+            memberService.friendRequest(username, friendId);
+
+            // Assert
+            verify(memberRepository, times(1)).findByUsername(username);
+            verify(memberRepository, times(1)).existsById(friendId);
+            verify(friendRepository, times(1)).save(any(Friend.class));
+        }
+
+        @Test
+        void not_exist_member() {
+            // Arrange
+            String username = "username-1234";
+            Long friendId = 1L;
+            final Member member = MemberSteps.createMember();
+
+            when(memberRepository.findByUsername(username)).thenReturn(Mono.just(member));
+            when(memberRepository.existsById(friendId)).thenReturn(Mono.empty());
+
+            // Act
+            memberService.friendRequest(username, friendId);
+
+            // Assert
+            verify(memberRepository, times(1)).findByUsername(username);
+            verify(memberRepository, times(1)).existsById(friendId);
+            verify(friendRepository, times(0)).save(any(Friend.class));
+        }
     }
 
 }
