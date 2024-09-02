@@ -46,9 +46,9 @@ public class Member {
         return passwordEncoder.matches(password, this.password);
     }
 
-    public Mono<Member> update(final MemberUpdateDto memberUpdateDto) {
+    public Member update(final MemberUpdateDto memberUpdateDto) {
         this.username = memberUpdateDto.getUsername();
         this.nickName = memberUpdateDto.getNickName();
-        return Mono.just(this);
+        return this;
     }
 }

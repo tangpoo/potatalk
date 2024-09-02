@@ -129,11 +129,12 @@ public class MemberServiceTests {
     void update_member_success() {
         // Arrange
         final String username = "username-1234";
-        final MemberUpdateDto memberUpdateDto = new MemberUpdateDto("username-4321",
-            "nickName-4321");
+        final MemberUpdateDto memberUpdateDto = new MemberUpdateDto("username-update",
+            "nickName-update");
         final Member member = MemberSteps.createMember();
 
         when(memberRepository.findByUsername(anyString())).thenReturn(Mono.just(member));
+        when(memberRepository.save(any(Member.class))).thenReturn(Mono.just(member));
 
         // Act
         final Mono<MemberRes> result = memberService.updateMember(memberUpdateDto,
