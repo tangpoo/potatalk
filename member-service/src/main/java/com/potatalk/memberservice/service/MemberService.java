@@ -9,12 +9,14 @@ import com.potatalk.memberservice.dto.SignInDto;
 import com.potatalk.memberservice.dto.SingUpDto;
 import com.potatalk.memberservice.repository.FriendRepository;
 import com.potatalk.memberservice.repository.MemberRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -30,7 +32,7 @@ public class MemberService {
     public Mono<MemberRes> createMember(final SingUpDto singUpDto) {
         return memberRepository
             .save(Member.createMember(singUpDto, passwordEncoder))
-            .flatMap(MemberRes::from);
+            .map(MemberRes::from);
     }
 
     public Mono<String> signIn(final SignInDto signInDto) {
@@ -47,9 +49,9 @@ public class MemberService {
         return memberRepository.
             findByUsername(username)
             .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
-            .flatMap(member -> member.update(memberUpdateDto))
+            .map(member -> member.update(memberUpdateDto))
             .flatMap(memberRepository::save)
-            .flatMap(MemberRes::from);
+            .map(MemberRes::from);
     }
 
     public void deleteMember(final String username) {
@@ -64,7 +66,7 @@ public class MemberService {
         return memberRepository
             .findById(memberId)
             .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
-            .flatMap(MemberRes::from);
+            .map(MemberRes::from);
     }
 
     public void friendRequest(String username, final Long friendId) {
@@ -82,6 +84,17 @@ public class MemberService {
                     })
             )
             .subscribe();
+    }
+
+    public Flux<MemberRes> findAllFriend(final String username) {
+        return memberRepository.findByUsername(username)
+            .flatMapMany(member ->
+                friendRepository.findAllFriendsByMemberId(member.getId())
+                    .map(friend -> friend.getMemberId().equals(member.getId()) ? friend.getFriendId() : friend.getMemberId())
+                    .collectList()
+                    .flatMapMany(memberRepository::findAllById)
+                    .map(MemberRes::from)
+            );
     }
 
     private static class MemberValidator {
