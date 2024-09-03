@@ -100,5 +100,7 @@ public class MemberController {
         @AuthenticationPrincipal UserDetails userDetails,
         @PathVariable Long friendId) {
         memberService.acceptFriendRequest(userDetails.getUsername(), friendId);
+
+        return Mono.just(ResponseEntity.noContent().build());
     }
 }
