@@ -9,7 +9,6 @@ import com.potatalk.memberservice.dto.SignInDto;
 import com.potatalk.memberservice.dto.SingUpDto;
 import com.potatalk.memberservice.repository.FriendRepository;
 import com.potatalk.memberservice.repository.MemberRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -88,6 +87,7 @@ public class MemberService {
 
     public Flux<MemberRes> findAllFriend(final String username) {
         return memberRepository.findByUsername(username)
+            .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
             .flatMapMany(member ->
                 friendRepository.findAllFriendsByMemberId(member.getId())
                     .map(friend -> friend.getMemberId().equals(member.getId()) ? friend.getFriendId() : friend.getMemberId())
@@ -95,6 +95,20 @@ public class MemberService {
                     .flatMapMany(memberRepository::findAllById)
                     .map(MemberRes::from)
             );
+    }
+
+    public void acceptFriendRequest(final String username, final Long friendId) {
+        memberRepository.findByUsername(username)
+            .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
+            .flatMap(member ->
+                friendRepository.findByMemberIdAndFriendId(member.getId(), friendId))
+            .switchIfEmpty(Mono.error(new ClassNotFoundException()))
+            .flatMap(friend -> friendRepository.save(friend.accept()))
+            .then()
+            .subscribe();
+
+
+        //member 찾기 - memberId와 friendId로 friend 찾기 - friend 상태 변경 - save
     }
 
     private static class MemberValidator {
