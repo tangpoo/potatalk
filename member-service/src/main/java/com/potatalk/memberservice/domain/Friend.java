@@ -26,7 +26,8 @@ public class Friend {
         return new Friend(memberId, friendId);
     }
 
-    public void accept(final boolean isAccepted) {
-        this.isAccepted = isAccepted;
+    public Friend accept() {
+        this.isAccepted = true;
+        return this;
     }
 }
