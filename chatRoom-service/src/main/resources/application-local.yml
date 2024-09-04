@@ -1,0 +1,12 @@
+server:
+  port: 8081
+
+spring:
+  r2dbc:
+    url: r2dbc:pool:mysql://localhost:3306/potatalk
+    username: root
+    password: 1234
+
+logging:
+  level:
+    org.springframework.r2dbc.core: debug
