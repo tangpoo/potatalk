@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import com.potatalk.memberservice.config.jwt.JwtTokenProvider;
 import com.potatalk.memberservice.domain.Friend;
+import com.potatalk.memberservice.domain.FriendSteps;
 import com.potatalk.memberservice.domain.Member;
 import com.potatalk.memberservice.dto.MemberRes;
 import com.potatalk.memberservice.dto.MemberUpdateDto;
@@ -220,8 +221,8 @@ public class MemberServiceTests {
         String username = "username-1234";
 
         final Member member = MemberSteps.createMemberWithUsername(username);
-        final Friend friend1 = Friend.create(1L, 1L);
-        final Friend friend2 = Friend.create(1L, 2L);
+        final Friend friend1 = FriendSteps.create(1L, 1L);
+        final Friend friend2 = FriendSteps.create(1L, 2L);
         final Member friendInfo1 = MemberSteps.createMemberWithUsername("username-2345");
         final Member friendInfo2 = MemberSteps.createMemberWithUsername("username-3456");
 
@@ -240,6 +241,30 @@ public class MemberServiceTests {
             .expectNextMatches(res -> res.getUsername().equals(friendInfo1.getUsername()))
             .expectNextMatches(res -> res.getUsername().equals(friendInfo2.getUsername()))
             .verifyComplete();
+    }
+
+    @Test
+    void accept_friend_request() {
+        // Arrange
+        String username = "username-1234";
+        Long friendId = 1L;
+        final Member member = MemberSteps.createMember();
+        final Friend friend = FriendSteps.create(1L, 1L);
+
+        final Member spyMember = Mockito.spy(member);
+        doReturn(1L).when(spyMember).getId();
+
+        when(memberRepository.findByUsername(username)).thenReturn(Mono.just(spyMember));
+        when(friendRepository.findByMemberIdAndFriendId(anyLong(), anyLong())).thenReturn(Mono.just(friend));
+        when(friendRepository.save(any(Friend.class))).thenReturn(Mono.just(friend));
+
+        // Act
+        memberService.acceptFriendRequest(username, friendId);
+
+        // Assert
+        verify(memberRepository, times(1)).findByUsername(username);
+        verify(friendRepository, times(1)).findByMemberIdAndFriendId(1L, 1L);
+        verify(friendRepository, times(1)).save(any(Friend.class));
     }
 
 }

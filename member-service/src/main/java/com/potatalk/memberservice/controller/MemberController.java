@@ -94,4 +94,13 @@ public class MemberController {
                 .body(res)
             );
     }
+
+    @PostMapping("/friend/{friendId}/accept")
+    public Mono<ResponseEntity<Void>> acceptFriendRequest(
+        @AuthenticationPrincipal UserDetails userDetails,
+        @PathVariable Long friendId) {
+        memberService.acceptFriendRequest(userDetails.getUsername(), friendId);
+
+        return Mono.just(ResponseEntity.noContent().build());
+    }
 }
