@@ -8,7 +8,7 @@ plugins {
 group = 'com.potatalk'
 version = '0.0.1-SNAPSHOT'
 
-def jarFileName = 'delivery-info-service'
+def jarFileName = 'member-service'
 
 bootJar {
 	archiveBaseName.set(jarFileName)
@@ -47,7 +47,7 @@ sourceSets {
 }
 
 task integrationTest(type: Test) {
-	description = 'Delivery-Info-Service : Integration Test'
+	description = 'Member-Service : Integration Test'
 	group = 'verification'
 	testClassesDirs = sourceSets.integrationTest.output.classesDirs
 	classpath = sourceSets.integrationTest.runtimeClasspath
@@ -78,7 +78,7 @@ jacocoTestReport {
 		afterEvaluate {
 			classDirectories.setFrom(files(classDirectories.files.collect {
 				fileTree(dir: it, excludes: [
-						"com/potatorider/Application.*"
+						"com/potatalk/Application.*"
 				])
 			}))
 		}
