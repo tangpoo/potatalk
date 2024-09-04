@@ -1,1 +1,3 @@
 include 'member-service'
+include 'chatRoom-service'
+
