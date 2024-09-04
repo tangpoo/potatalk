@@ -1,5 +1,6 @@
 package com.potatalk.chatroomservice.domain;
 
+import com.potatalk.chatroomservice.dto.CreateChatRoomDto;
 import com.potatalk.chatroomservice.exception.MaxParticipantsExceededException;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
@@ -14,6 +15,8 @@ public class ChatRoom {
 
     private Long createMemberId;
 
+    private String chatRoomName;
+
     private boolean IsPrivate;
 
     private String secretKey;
@@ -21,6 +24,19 @@ public class ChatRoom {
     private Integer maxParticipation;
 
     private Integer participationCount;
+
+    public ChatRoom(CreateChatRoomDto createChatRoomDto) {
+        this.createMemberId = createChatRoomDto.getMemberId();
+        this.chatRoomName = createChatRoomDto.getChatRoomName();
+        IsPrivate = createChatRoomDto.isPrivate();
+        this.secretKey = createChatRoomDto.getSecretKey();
+        this.maxParticipation = createChatRoomDto.getMaxParticipation();
+        this.participationCount = 0;
+    }
+
+    public static ChatRoom create(final CreateChatRoomDto createChatRoomDto) {
+        return new ChatRoom(createChatRoomDto);
+    }
 
     public boolean matchSecretKey(String secretKey) {
         return this.secretKey.equals(secretKey);
