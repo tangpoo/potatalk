@@ -5,12 +5,13 @@ import com.potatalk.chatroomservice.domain.ChatRoomStatus;
 import com.potatalk.chatroomservice.domain.Participation;
 import com.potatalk.chatroomservice.domain.ParticipationStatus;
 import com.potatalk.chatroomservice.dto.CreateChatRoomDto;
+import com.potatalk.chatroomservice.exception.ChatRoomNotFound;
+import com.potatalk.chatroomservice.exception.PrivateKeyIsNotMatchedException;
 import com.potatalk.chatroomservice.repository.ChatRoomRepository;
 import com.potatalk.chatroomservice.repository.ParticipationRepository;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
@@ -38,10 +39,12 @@ public class ChatRoomService {
     public Mono<ChatRoom> createOneToOneChatRoom(CreateChatRoomDto createChatRoomDto) {
         Long memberId = createChatRoomDto.getMemberId();
         Long friendId = createChatRoomDto.getFriendId();
-        return chatRoomRepository.findOneToOneChatRoom(memberId, friendId, ChatRoomStatus.ONE_TO_ONE)
+        return chatRoomRepository.findOneToOneChatRoom(memberId, friendId,
+                ChatRoomStatus.ONE_TO_ONE)
             .switchIfEmpty(
                 Mono.defer(() -> {
-                    ChatRoom chatRoom = ChatRoom.create(createChatRoomDto, ChatRoomStatus.ONE_TO_ONE);
+                    ChatRoom chatRoom = ChatRoom.create(createChatRoomDto,
+                        ChatRoomStatus.ONE_TO_ONE);
 
                     return chatRoomRepository.save(chatRoom)
                         .flatMap(savedRoom -> {
@@ -50,12 +53,33 @@ public class ChatRoomService {
                             Participation friendParticipation = Participation.create(memberId,
                                 savedRoom.getId(), ParticipationStatus.JOINED);
 
-                            return participationRepository.saveAll(Arrays.asList(memberParticipation, friendParticipation))
+                            return participationRepository.saveAll(
+                                    Arrays.asList(memberParticipation, friendParticipation))
                                 .then(Mono.just(savedRoom));
                         });
                 })
             )
             .as(transactionalOperator::transactional);
+    }
+
+    public Mono<ChatRoom> joinChatRoom(Long roomId, Long memberId, String secretKey) {
+        return chatRoomRepository.findById(roomId)
+            .switchIfEmpty(Mono.error(new ChatRoomNotFound("ChatRoom not found")))
+            .flatMap(chatRoom -> {
+                if (chatRoom.getIsPrivate()) {
+                    matchPrivateKey(chatRoom, secretKey);
+                }
+                return participationRepository.save(
+                        Participation.create(memberId, chatRoom.getId(), ParticipationStatus.JOINED))
+                    .thenReturn(chatRoom);
+            });
+
+    }
+
+    private void matchPrivateKey(ChatRoom chatRoom, String secretKey) {
+        if (!chatRoom.matchSecretKey(secretKey)) {
+            throw new PrivateKeyIsNotMatchedException("privateKey not matched");
+        }
     }
 }
 

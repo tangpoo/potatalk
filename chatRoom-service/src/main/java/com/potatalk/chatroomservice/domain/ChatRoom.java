@@ -17,7 +17,7 @@ public class ChatRoom {
 
     private String roomName;
 
-    private boolean IsPrivate;
+    private Boolean isPrivate;
 
     private String secretKey;
 
@@ -30,16 +30,18 @@ public class ChatRoom {
     public ChatRoom(CreateChatRoomDto createChatRoomDto, ChatRoomStatus chatRoomStatus) {
         this.createMemberId = createChatRoomDto.getMemberId();
         this.roomName = createChatRoomDto.getChatRoomName();
-        this.IsPrivate = createChatRoomDto.isPrivate();
+        this.isPrivate = createChatRoomDto.isPrivate();
         this.secretKey = createChatRoomDto.getSecretKey();
         this.chatRoomStatus = chatRoomStatus;
         this.maxParticipation = createChatRoomDto.getMaxParticipation();
         this.participationCount = 0;
     }
 
-    public static ChatRoom create(final CreateChatRoomDto createChatRoomDto, ChatRoomStatus chatRoomStatus) {
+    public static ChatRoom create(final CreateChatRoomDto createChatRoomDto,
+        ChatRoomStatus chatRoomStatus) {
         return new ChatRoom(createChatRoomDto, chatRoomStatus);
     }
+
     public boolean matchSecretKey(String secretKey) {
         return this.secretKey.equals(secretKey);
     }
