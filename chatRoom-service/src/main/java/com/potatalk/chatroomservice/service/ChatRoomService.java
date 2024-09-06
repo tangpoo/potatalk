@@ -73,7 +73,6 @@ public class ChatRoomService {
                         Participation.create(memberId, chatRoom.getId(), ParticipationStatus.JOINED))
                     .thenReturn(chatRoom);
             });
-
     }
 
     private void matchPrivateKey(ChatRoom chatRoom, String secretKey) {
