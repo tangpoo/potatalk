@@ -9,6 +9,8 @@ public class CreateChatRoomDto {
 
     private Long memberId;
 
+    private Long friendId;
+
     private String chatRoomName;
 
     private boolean isPrivate;

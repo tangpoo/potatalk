@@ -15,20 +15,21 @@ public class Participation {
 
     private Long memberId;
 
-    private Long chatRoomId;
+    private Long roomId;
 
-    private boolean isJoined = false;
+    private ParticipationStatus participationStatus;
 
-    private Participation(final Long memberId, final Long chatRoomId) {
+    private Participation(final Long memberId, final Long roomId, final ParticipationStatus participationStatus) {
         this.memberId = memberId;
-        this.chatRoomId = chatRoomId;
+        this.roomId = roomId;
+        this.participationStatus = participationStatus;
     }
 
-    public static Participation create(Long memberId, Long chatROomId) {
-        return new Participation(memberId, chatROomId);
+    public static Participation create(Long memberId, Long chatRoomId, ParticipationStatus participationStatus) {
+        return new Participation(memberId, chatRoomId, participationStatus);
     }
 
     public void join() {
-        this.isJoined = true;
+        this.participationStatus = ParticipationStatus.JOINED;
     }
 }

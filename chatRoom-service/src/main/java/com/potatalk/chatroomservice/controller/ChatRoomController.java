@@ -27,4 +27,11 @@ public class ChatRoomController {
         return chatRoomService.createChatRoom(createChatRoomDto)
             .map(res -> ResponseEntity.status(HttpStatus.CREATED).body(res));
     }
+
+    @PostMapping
+    public Mono<ResponseEntity<ChatRoom>> creatOneToOneChatRoom(
+        @RequestBody CreateChatRoomDto createChatRoomDto) {
+        return chatRoomService.createOneToOneChatRoom(createChatRoomDto)
+            .map(res -> ResponseEntity.status(HttpStatus.CREATED).body(res));
+    }
 }
