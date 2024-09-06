@@ -15,8 +15,6 @@ import reactor.core.publisher.Mono;
 
 @Table("members")
 @Getter
-@NoArgsConstructor
-@Slf4j
 public class Member {
 
     @Id
