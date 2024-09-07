@@ -39,26 +39,19 @@ public class ChatRoomService {
     public Mono<ChatRoom> createOneToOneChatRoom(CreateChatRoomDto createChatRoomDto) {
         Long memberId = createChatRoomDto.getMemberId();
         Long friendId = createChatRoomDto.getFriendId();
-        return chatRoomRepository.findOneToOneChatRoom(memberId, friendId,
-                ChatRoomStatus.ONE_TO_ONE)
-            .switchIfEmpty(
-                Mono.defer(() -> {
-                    ChatRoom chatRoom = ChatRoom.create(createChatRoomDto,
-                        ChatRoomStatus.ONE_TO_ONE);
 
-                    return chatRoomRepository.save(chatRoom)
-                        .flatMap(savedRoom -> {
-                            Participation memberParticipation = Participation.create(memberId,
-                                savedRoom.getId(), ParticipationStatus.JOINED);
-                            Participation friendParticipation = Participation.create(memberId,
-                                savedRoom.getId(), ParticipationStatus.JOINED);
+        return chatRoomRepository.findOneToOneChatRoom(memberId, friendId, ChatRoomStatus.ONE_TO_ONE)
+            .switchIfEmpty(Mono.defer(() -> {
+                ChatRoom chatRoom = ChatRoom.create(createChatRoomDto, ChatRoomStatus.ONE_TO_ONE);
+                return chatRoomRepository.save(chatRoom);
+            }))
+            .flatMap(savedRoom -> {
+                Participation memberParticipation = Participation.create(memberId, savedRoom.getId(), ParticipationStatus.JOINED);
+                Participation friendParticipation = Participation.create(friendId, savedRoom.getId(), ParticipationStatus.JOINED);
 
-                            return participationRepository.saveAll(
-                                    Arrays.asList(memberParticipation, friendParticipation))
-                                .then(Mono.just(savedRoom));
-                        });
-                })
-            )
+                return participationRepository.saveAll(Arrays.asList(memberParticipation, friendParticipation))
+                    .then(Mono.just(savedRoom));
+            })
             .as(transactionalOperator::transactional);
     }
 
@@ -69,8 +62,13 @@ public class ChatRoomService {
                 if (chatRoom.getIsPrivate()) {
                     matchPrivateKey(chatRoom, secretKey);
                 }
-                return participationRepository.save(
+
+                chatRoom.joinParticipation();
+
+                return chatRoomRepository.save(chatRoom)
+                    .then(participationRepository.save(
                         Participation.create(memberId, chatRoom.getId(), ParticipationStatus.JOINED))
+                    )
                     .thenReturn(chatRoom);
             });
     }

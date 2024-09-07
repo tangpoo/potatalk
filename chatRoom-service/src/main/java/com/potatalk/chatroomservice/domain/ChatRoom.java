@@ -46,6 +46,7 @@ public class ChatRoom {
         return this.secretKey.equals(secretKey);
     }
 
+
     public void joinParticipation() {
         if (participationCount + 1 > maxParticipation) {
             throw new MaxParticipantsExceededException("채팅방이 최대 인원입니다.");
