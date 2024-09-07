@@ -1,7 +1,10 @@
 package com.potatalk.service;
 
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -105,10 +108,13 @@ public class ChatRoomServiceTests {
             String secretKey = "secretKey-1234";
 
             final ChatRoom chatRoom = ChatRoomSteps.createChatRoom();
+            final ChatRoom spyChatRoom = spy(chatRoom);
+            doReturn(1L).when(spyChatRoom).getId();
             final Participation participation = ParticipationSteps.create(memberId, roomId,
                 ParticipationStatus.JOINED);
 
-            when(chatRoomRepository.findById(memberId)).thenReturn(Mono.just(chatRoom));
+            when(chatRoomRepository.findById(anyLong())).thenReturn(Mono.just(chatRoom));
+            when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(Mono.just(chatRoom));
             when(participationRepository.save(any(Participation.class))).thenReturn(
                 Mono.just(participation));
 
@@ -119,6 +125,7 @@ public class ChatRoomServiceTests {
             // Assert
             StepVerifier.create(result).expectNext(chatRoom).verifyComplete();
             verify(chatRoomRepository, times(1)).findById(roomId);
+            verify(chatRoomRepository, times(1)).save(any(ChatRoom.class));
             verify(participationRepository, times(1)).save(any(Participation.class));
         }
 
@@ -131,7 +138,7 @@ public class ChatRoomServiceTests {
 
             final ChatRoom chatRoom = ChatRoomSteps.createPrivateChatRoom();
 
-            when(chatRoomRepository.findById(memberId)).thenReturn(Mono.just(chatRoom));
+            when(chatRoomRepository.findById(roomId)).thenReturn(Mono.just(chatRoom));
 
             // Act
             final Mono<ChatRoom> result = chatRoomService.joinChatRoom(roomId, memberId,
@@ -140,6 +147,7 @@ public class ChatRoomServiceTests {
             // Assert
             StepVerifier.create(result).expectError(PrivateKeyIsNotMatchedException.class).verify();
             verify(chatRoomRepository, times(1)).findById(roomId);
+            verify(chatRoomRepository, times(0)).save(any(ChatRoom.class));
             verify(participationRepository, times(0)).save(any(Participation.class));
         }
     }
