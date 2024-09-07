@@ -14,7 +14,6 @@ import com.potatalk.chatroomservice.domain.ChatRoomStatus;
 import com.potatalk.chatroomservice.domain.Participation;
 import com.potatalk.chatroomservice.domain.ParticipationStatus;
 import com.potatalk.chatroomservice.dto.CreateChatRoomDto;
-import com.potatalk.chatroomservice.exception.ChatRoomNotFound;
 import com.potatalk.chatroomservice.exception.PrivateKeyIsNotMatchedException;
 import com.potatalk.chatroomservice.repository.ChatRoomRepository;
 import com.potatalk.chatroomservice.repository.ParticipationRepository;
@@ -98,7 +97,7 @@ public class ChatRoomServiceTests {
     }
 
     @Nested
-    class join_chat_room {
+    class Join_chat_room {
 
         @Test
         void success_private_room() {
@@ -148,6 +147,48 @@ public class ChatRoomServiceTests {
             StepVerifier.create(result).expectError(PrivateKeyIsNotMatchedException.class).verify();
             verify(chatRoomRepository, times(1)).findById(roomId);
             verify(chatRoomRepository, times(0)).save(any(ChatRoom.class));
+            verify(participationRepository, times(0)).save(any(Participation.class));
+        }
+    }
+
+    @Nested
+    class Invited_chatRoom {
+
+        @Test
+        void success() {
+            // Arrange
+            Long memberId = 1L;
+            Long roomId = 1L;
+            ChatRoom chatRoom = ChatRoomSteps.createChatRoom();
+            Participation participation = ParticipationSteps.create(memberId, roomId, ParticipationStatus.INVITED);
+
+            when(chatRoomRepository.findById(roomId)).thenReturn(Mono.just(chatRoom));
+            when(participationRepository.save(any(Participation.class))).thenReturn(Mono.just(participation));
+
+            // Act
+            final Mono<ChatRoom> result = chatRoomService.inviteChatRoom(roomId, memberId);
+
+            // Assert
+            StepVerifier.create(result).expectNext(chatRoom).verifyComplete();
+            verify(chatRoomRepository, times(1)).findById(roomId);
+            verify(participationRepository, times(1)).save(any(Participation.class));
+        }
+
+        @Test
+        void fail_full_participation_chat_room() {
+            // Arrange
+            Long memberId = 1L;
+            Long roomId = 1L;
+            ChatRoom chatRoom = ChatRoomSteps.createFullParticipationChatRoom();
+
+            when(chatRoomRepository.findById(roomId)).thenReturn(Mono.just(chatRoom));
+
+            // Act
+            final Mono<ChatRoom> result = chatRoomService.inviteChatRoom(roomId, memberId);
+
+            // Assert
+            StepVerifier.create(result).expectError(IllegalArgumentException.class).verify();
+            verify(chatRoomRepository, times(1)).findById(roomId);
             verify(participationRepository, times(0)).save(any(Participation.class));
         }
     }
