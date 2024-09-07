@@ -54,4 +54,7 @@ public class ChatRoom {
         this.participationCount++;
     }
 
+    public boolean canInviteParticipation() {
+        return participationCount < maxParticipation;
+    }
 }

@@ -24,4 +24,12 @@ public class ChatRoomSteps {
     public static ChatRoom createPrivateChatRoom() {
         return ChatRoom.create(createGroupChatRoomDto(true, "secretKey-1234"), ChatRoomStatus.GROUP);
     }
+
+    public static CreateChatRoomDto createFullParticipationChatRoomDto() {
+        return new CreateChatRoomDto(1L, null, "chatRoomName-1234", false, null, 0);
+    }
+
+    public static ChatRoom createFullParticipationChatRoom() {
+        return ChatRoom.create(createFullParticipationChatRoomDto(), ChatRoomStatus.GROUP);
+    }
 }
