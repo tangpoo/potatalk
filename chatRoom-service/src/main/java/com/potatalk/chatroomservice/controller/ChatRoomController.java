@@ -43,6 +43,15 @@ public class ChatRoomController {
         @RequestParam Long memberId,
         @RequestParam String secretKey) {
         return chatRoomService.joinChatRoom(roomId, memberId, secretKey)
-            .map(res -> ResponseEntity.status(HttpStatus.CREATED).body(res));
+            .map(res -> ResponseEntity.status(HttpStatus.OK).body(res));
+    }
+
+    @PostMapping("/{roomId}/invite/{memberId}")
+    public Mono<ResponseEntity<ChatRoom>> inviteChatRoom(
+        @PathVariable Long roomId,
+        @PathVariable Long memberId
+    ) {
+        return chatRoomService.inviteChatRoom(roomId, memberId)
+            .map(res -> ResponseEntity.status(HttpStatus.OK).body(res));
     }
 }

@@ -12,6 +12,7 @@ import com.potatalk.chatroomservice.repository.ParticipationRepository;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
@@ -40,16 +41,20 @@ public class ChatRoomService {
         Long memberId = createChatRoomDto.getMemberId();
         Long friendId = createChatRoomDto.getFriendId();
 
-        return chatRoomRepository.findOneToOneChatRoom(memberId, friendId, ChatRoomStatus.ONE_TO_ONE)
+        return chatRoomRepository.findOneToOneChatRoom(memberId, friendId,
+                ChatRoomStatus.ONE_TO_ONE)
             .switchIfEmpty(Mono.defer(() -> {
                 ChatRoom chatRoom = ChatRoom.create(createChatRoomDto, ChatRoomStatus.ONE_TO_ONE);
                 return chatRoomRepository.save(chatRoom);
             }))
             .flatMap(savedRoom -> {
-                Participation memberParticipation = Participation.create(memberId, savedRoom.getId(), ParticipationStatus.JOINED);
-                Participation friendParticipation = Participation.create(friendId, savedRoom.getId(), ParticipationStatus.JOINED);
+                Participation memberParticipation = Participation.create(memberId,
+                    savedRoom.getId(), ParticipationStatus.JOINED);
+                Participation friendParticipation = Participation.create(friendId,
+                    savedRoom.getId(), ParticipationStatus.JOINED);
 
-                return participationRepository.saveAll(Arrays.asList(memberParticipation, friendParticipation))
+                return participationRepository.saveAll(
+                        Arrays.asList(memberParticipation, friendParticipation))
                     .then(Mono.just(savedRoom));
             })
             .as(transactionalOperator::transactional);
@@ -67,7 +72,8 @@ public class ChatRoomService {
 
                 return chatRoomRepository.save(chatRoom)
                     .then(participationRepository.save(
-                        Participation.create(memberId, chatRoom.getId(), ParticipationStatus.JOINED))
+                        Participation.create(memberId, chatRoom.getId(),
+                            ParticipationStatus.JOINED))
                     )
                     .thenReturn(chatRoom);
             });
@@ -77,6 +83,22 @@ public class ChatRoomService {
         if (!chatRoom.matchSecretKey(secretKey)) {
             throw new PrivateKeyIsNotMatchedException("privateKey not matched");
         }
+    }
+
+    public Mono<ChatRoom> inviteChatRoom(Long roomId, Long memberId) {
+        return chatRoomRepository.findById(roomId)
+            .switchIfEmpty(Mono.error(new ChatRoomNotFound("ChatRoom not found")))
+            .flatMap(chatRoom -> {
+
+                if (!chatRoom.canInviteParticipation()) {
+                    return Mono.error(new IllegalArgumentException("채팅방이 최대 인원입니다."));
+                }
+
+                return participationRepository.save(
+                        Participation.create(memberId, chatRoom.getId(), ParticipationStatus.INVITED)
+                    )
+                    .thenReturn(chatRoom);
+            });
     }
 }
 
