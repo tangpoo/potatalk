@@ -59,8 +59,23 @@ public class ChatRoomController {
     }
 
     @GetMapping("/{memberId}/invite")
-    public Flux<ResponseEntity<Participation>> findAllInviteParticipation(@PathVariable Long memberId) {
+    public Flux<ResponseEntity<Participation>> findAllInviteParticipation(
+        @PathVariable Long memberId) {
         return chatRoomService.findAllInviteParticipation(memberId)
             .map(res -> ResponseEntity.status(HttpStatus.OK).body(res));
+    }
+
+    @PostMapping("/{participationId}/accept")
+    public Mono<ResponseEntity<Participation>> acceptInviteParticipation(
+        @PathVariable Long participationId) {
+        return chatRoomService.acceptInviteParticipation(participationId)
+            .map(res -> ResponseEntity.status(HttpStatus.OK).body(res));
+    }
+
+    @PostMapping("/{participationId}/cancel")
+    public Mono<ResponseEntity<Void>> cancelInviteParticipation(
+        @PathVariable Long participationId) {
+        return chatRoomService.cancelInviteParticipation(participationId)
+            .then(Mono.fromCallable(() -> ResponseEntity.status(HttpStatus.OK).build()));
     }
 }

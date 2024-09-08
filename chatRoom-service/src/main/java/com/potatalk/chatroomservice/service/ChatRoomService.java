@@ -105,5 +105,21 @@ public class ChatRoomService {
     public Flux<Participation> findAllInviteParticipation(final Long memberId) {
         return participationRepository.findAllByMemberId(memberId);
     }
+
+    public Mono<Participation> acceptInviteParticipation(final Long participationId) {
+        return participationRepository.findById(participationId)
+            .flatMap(participation -> {
+                if (!participation.getParticipationStatus().equals(ParticipationStatus.INVITED)) {
+                    return Mono.error(new IllegalArgumentException("초대된 상태가 아닙니다."));
+                }
+                participation.join();
+                return participationRepository.save(participation);
+            });
+    }
+
+    public Mono<Void> cancelInviteParticipation(final Long participationId) {
+        return participationRepository.findById(participationId)
+            .flatMap(participationRepository::delete);
+    }
 }
 
