@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.reactive.TransactionalOperator;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -99,6 +100,10 @@ public class ChatRoomService {
                     )
                     .thenReturn(chatRoom);
             });
+    }
+
+    public Flux<Participation> findAllInviteParticipation(final Long memberId) {
+        return participationRepository.findAllByMemberId(memberId);
     }
 }
 
