@@ -1,18 +1,21 @@
 package com.potatalk.chatroomservice.controller;
 
 import com.potatalk.chatroomservice.domain.ChatRoom;
+import com.potatalk.chatroomservice.domain.Participation;
 import com.potatalk.chatroomservice.dto.CreateChatRoomDto;
 import com.potatalk.chatroomservice.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -53,5 +56,26 @@ public class ChatRoomController {
     ) {
         return chatRoomService.inviteChatRoom(roomId, memberId)
             .map(res -> ResponseEntity.status(HttpStatus.OK).body(res));
+    }
+
+    @GetMapping("/{memberId}/invite")
+    public Flux<ResponseEntity<Participation>> findAllInviteParticipation(
+        @PathVariable Long memberId) {
+        return chatRoomService.findAllInviteParticipation(memberId)
+            .map(res -> ResponseEntity.status(HttpStatus.OK).body(res));
+    }
+
+    @PostMapping("/{participationId}/accept")
+    public Mono<ResponseEntity<Participation>> acceptInviteParticipation(
+        @PathVariable Long participationId) {
+        return chatRoomService.acceptInviteParticipation(participationId)
+            .map(res -> ResponseEntity.status(HttpStatus.OK).body(res));
+    }
+
+    @PostMapping("/{participationId}/cancel")
+    public Mono<ResponseEntity<Void>> cancelInviteParticipation(
+        @PathVariable Long participationId) {
+        return chatRoomService.cancelInviteParticipation(participationId)
+            .then(Mono.fromCallable(() -> ResponseEntity.status(HttpStatus.OK).build()));
     }
 }
