@@ -8,4 +8,6 @@ import reactor.core.publisher.Mono;
 public interface ParticipationRepository extends R2dbcRepository<Participation, Long> {
 
     Flux<Participation> findAllByMemberId(Long memberId);
+
+    Mono<Participation> findByRoomIdAndMemberId(Long roomId, Long memberId);
 }
