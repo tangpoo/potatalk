@@ -12,7 +12,6 @@ import com.potatalk.chatroomservice.repository.ParticipationRepository;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
@@ -95,10 +94,22 @@ public class ChatRoomService {
                     return Mono.error(new IllegalArgumentException("채팅방이 최대 인원입니다."));
                 }
 
-                return participationRepository.save(
-                        Participation.create(memberId, chatRoom.getId(), ParticipationStatus.INVITED)
-                    )
-                    .thenReturn(chatRoom);
+                return participationRepository.findByRoomIdAndMemberId(roomId, memberId)
+                    .flatMap(participation -> {
+                        if (participation.getParticipationStatus() == ParticipationStatus.INVITED
+                            || participation.getParticipationStatus()
+                            == ParticipationStatus.JOINED) {
+                            return Mono.error(
+                                new IllegalArgumentException("해당 멤버는 이미 초대되었거나 참여 중입니다."));
+                        }
+                        return Mono.just(chatRoom);
+                    })
+                    .switchIfEmpty(Mono.defer(() ->
+                        participationRepository.save(
+                            Participation.create(memberId, chatRoom.getId(),
+                                ParticipationStatus.INVITED)
+                            ).thenReturn(chatRoom))
+                    );
             });
     }
 

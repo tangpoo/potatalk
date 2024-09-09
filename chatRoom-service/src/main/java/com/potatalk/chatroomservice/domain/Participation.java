@@ -32,4 +32,8 @@ public class Participation {
     public void join() {
         this.participationStatus = ParticipationStatus.JOINED;
     }
+
+    public void invite() {
+        this.participationStatus = ParticipationStatus.INVITED;
+    }
 }
