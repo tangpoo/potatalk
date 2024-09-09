@@ -102,7 +102,9 @@ public class ChatRoomService {
                             return Mono.error(
                                 new IllegalArgumentException("해당 멤버는 이미 초대되었거나 참여 중입니다."));
                         }
-                        return Mono.just(chatRoom);
+
+                        participation.invite();
+                        return participationRepository.save(participation).thenReturn(chatRoom);
                     })
                     .switchIfEmpty(Mono.defer(() ->
                         participationRepository.save(

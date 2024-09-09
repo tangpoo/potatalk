@@ -181,7 +181,7 @@ public class ChatRoomServiceTests {
         }
 
         @Test
-        void fail_exist_member() {
+        void fail_exist_and_invited_member() {
             // Arrange
             Long memberId = 1L;
             Long roomId = 1L;
@@ -201,6 +201,31 @@ public class ChatRoomServiceTests {
             verify(chatRoomRepository, times(1)).findById(roomId);
             verify(participationRepository, times(1)).findByRoomIdAndMemberId(roomId, memberId);
             verify(participationRepository, times(0)).save(any(Participation.class));
+        }
+
+        @Test
+        void fail_exist_and_left_member() {
+            // Arrange
+            Long memberId = 1L;
+            Long roomId = 1L;
+            ChatRoom chatRoom = ChatRoomSteps.createChatRoom();
+            Participation participation = ParticipationSteps.create(memberId, roomId,
+                ParticipationStatus.LEFT);
+
+            when(chatRoomRepository.findById(roomId)).thenReturn(Mono.just(chatRoom));
+            when(participationRepository.findByRoomIdAndMemberId(roomId, memberId)).thenReturn(
+                Mono.just(participation));
+            when(participationRepository.save(any(Participation.class))).thenReturn(
+                Mono.just(participation));
+
+            // Act
+            final Mono<ChatRoom> result = chatRoomService.inviteChatRoom(roomId, memberId);
+
+            // Assert
+            StepVerifier.create(result).expectNext(chatRoom).verifyComplete();
+            verify(chatRoomRepository, times(1)).findById(roomId);
+            verify(participationRepository, times(1)).findByRoomIdAndMemberId(roomId, memberId);
+            verify(participationRepository, times(1)).save(any(Participation.class));
         }
 
         @Test
