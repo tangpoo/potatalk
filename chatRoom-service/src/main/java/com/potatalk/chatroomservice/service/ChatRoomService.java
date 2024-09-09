@@ -94,25 +94,30 @@ public class ChatRoomService {
                     return Mono.error(new IllegalArgumentException("채팅방이 최대 인원입니다."));
                 }
 
-                return participationRepository.findByRoomIdAndMemberId(roomId, memberId)
-                    .flatMap(participation -> {
-                        if (participation.getParticipationStatus() == ParticipationStatus.INVITED
-                            || participation.getParticipationStatus()
-                            == ParticipationStatus.JOINED) {
-                            return Mono.error(
-                                new IllegalArgumentException("해당 멤버는 이미 초대되었거나 참여 중입니다."));
-                        }
-
-                        participation.invite();
-                        return participationRepository.save(participation).thenReturn(chatRoom);
-                    })
-                    .switchIfEmpty(Mono.defer(() ->
-                        participationRepository.save(
-                            Participation.create(memberId, chatRoom.getId(),
-                                ParticipationStatus.INVITED)
-                            ).thenReturn(chatRoom))
-                    );
+                return checkMemberParticipation(chatRoom, memberId);
             });
+    }
+
+    private Mono<ChatRoom> checkMemberParticipation(ChatRoom chatRoom, Long memberId) {
+        return participationRepository.findByRoomIdAndMemberId(chatRoom.getId(), memberId)
+            .flatMap(participation -> handleExistingParticipation(participation, chatRoom))
+            .switchIfEmpty(inviteNewMember(chatRoom, memberId));
+    }
+
+    private Mono<ChatRoom> inviteNewMember(final ChatRoom chatRoom, final Long memberId) {
+        return Mono.defer(() -> participationRepository.save(
+            Participation.create(memberId, chatRoom.getId(), ParticipationStatus.INVITED)
+        ).thenReturn(chatRoom));
+    }
+
+    private Mono<ChatRoom> handleExistingParticipation(final Participation participation, final ChatRoom chatRoom) {
+        if (participation.getParticipationStatus() == ParticipationStatus.INVITED
+        || participation.getParticipationStatus() == ParticipationStatus.JOINED) {
+            return Mono.error(new IllegalArgumentException("해당 멤버는 이미 초대되었거나 참여 중입니다."));
+        }
+
+        participation.invite();
+        return participationRepository.save(participation).thenReturn(chatRoom);
     }
 
     public Flux<Participation> findAllInviteParticipation(final Long memberId) {
