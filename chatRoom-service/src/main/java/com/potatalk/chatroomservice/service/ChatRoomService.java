@@ -4,6 +4,7 @@ import com.potatalk.chatroomservice.domain.ChatRoom;
 import com.potatalk.chatroomservice.domain.ChatRoomStatus;
 import com.potatalk.chatroomservice.domain.Participation;
 import com.potatalk.chatroomservice.domain.ParticipationStatus;
+import com.potatalk.chatroomservice.dto.ChatRoomInfoRes;
 import com.potatalk.chatroomservice.dto.CreateChatRoomDto;
 import com.potatalk.chatroomservice.exception.ChatRoomNotFound;
 import com.potatalk.chatroomservice.exception.PrivateKeyIsNotMatchedException;
@@ -138,6 +139,15 @@ public class ChatRoomService {
     public Mono<Void> cancelInviteParticipation(final Long participationId) {
         return participationRepository.findById(participationId)
             .flatMap(participationRepository::delete);
+    }
+
+    public Mono<ChatRoomInfoRes> findChatRoomInfo(Long roomId) {
+        return chatRoomRepository.findById(roomId)
+            .switchIfEmpty(Mono.error(new ChatRoomNotFound("ChatRoom not found")))
+            .flatMap(chatRoom ->
+                participationRepository.findAllIdByRoomId(roomId)
+                .collectList()
+                .map(participationIds -> ChatRoomInfoRes.from(chatRoom, participationIds)));
     }
 }
 
