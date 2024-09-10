@@ -149,5 +149,9 @@ public class ChatRoomService {
                 .collectList()
                 .map(participationIds -> ChatRoomInfoRes.from(chatRoom, participationIds)));
     }
+
+    public Flux<ChatRoom> findAllByMemberId(Long memberId) {
+        return chatRoomRepository.findAllByCreateMemberId(memberId);
+    }
 }
 
