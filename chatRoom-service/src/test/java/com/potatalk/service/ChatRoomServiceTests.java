@@ -13,6 +13,7 @@ import com.potatalk.chatroomservice.domain.ChatRoom;
 import com.potatalk.chatroomservice.domain.ChatRoomStatus;
 import com.potatalk.chatroomservice.domain.Participation;
 import com.potatalk.chatroomservice.domain.ParticipationStatus;
+import com.potatalk.chatroomservice.dto.ChatRoomInfoRes;
 import com.potatalk.chatroomservice.dto.CreateChatRoomDto;
 import com.potatalk.chatroomservice.exception.PrivateKeyIsNotMatchedException;
 import com.potatalk.chatroomservice.repository.ChatRoomRepository;
@@ -20,12 +21,12 @@ import com.potatalk.chatroomservice.repository.ParticipationRepository;
 import com.potatalk.chatroomservice.service.ChatRoomService;
 import com.potatalk.steps.ChatRoomSteps;
 import com.potatalk.steps.ParticipationSteps;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
@@ -253,5 +254,33 @@ public class ChatRoomServiceTests {
             verify(participationRepository, times(0)).findByRoomIdAndMemberId(roomId, memberId);
             verify(participationRepository, times(0)).save(any(Participation.class));
         }
+    }
+
+    @Test
+    void find_chat_room_info() {
+        // Arrange
+        Long roomId = 1L;
+        ChatRoom chatRoom = ChatRoomSteps.createChatRoom();
+        List<Long> participationIds = List.of(1L, 2L, 3L);
+
+        when(chatRoomRepository.findById(roomId)).thenReturn(Mono.just(chatRoom));
+        when(participationRepository.findAllIdByRoomId(roomId)).thenReturn(
+            Flux.fromIterable(participationIds));
+
+        // Act
+        Mono<ChatRoomInfoRes> result = chatRoomService.findChatRoomInfo(roomId);
+
+        // Assert
+        StepVerifier.create(result)
+            .expectNextMatches(chatRoomInfoRes ->
+                chatRoomInfoRes.getParticipationIds().equals(participationIds) &&
+                    chatRoomInfoRes.getCreateMemberId().equals(chatRoom.getCreateMemberId()) &&
+                    chatRoomInfoRes.getRoomName().equals(chatRoom.getRoomName()) &&
+                    chatRoomInfoRes.getIsPrivate().equals(chatRoom.getIsPrivate()) &&
+                    chatRoomInfoRes.getChatRoomStatus().equals(chatRoom.getChatRoomStatus()) &&
+                    chatRoomInfoRes.getMaxParticipation().equals(chatRoom.getMaxParticipation()) &&
+                    chatRoomInfoRes.getParticipationCount().equals(chatRoom.getParticipationCount())
+            )
+            .verifyComplete();
     }
 }

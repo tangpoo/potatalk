@@ -2,6 +2,7 @@ package com.potatalk.chatroomservice.controller;
 
 import com.potatalk.chatroomservice.domain.ChatRoom;
 import com.potatalk.chatroomservice.domain.Participation;
+import com.potatalk.chatroomservice.dto.ChatRoomInfoRes;
 import com.potatalk.chatroomservice.dto.CreateChatRoomDto;
 import com.potatalk.chatroomservice.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
@@ -77,5 +78,13 @@ public class ChatRoomController {
         @PathVariable Long participationId) {
         return chatRoomService.cancelInviteParticipation(participationId)
             .then(Mono.fromCallable(() -> ResponseEntity.status(HttpStatus.OK).build()));
+    }
+
+    @GetMapping("/{roomId}/info")
+    public Mono<ResponseEntity<ChatRoomInfoRes>> findChatRoomInfo(
+        @PathVariable Long roomId
+    ) {
+        return chatRoomService.findChatRoomInfo(roomId)
+            .map(res -> ResponseEntity.status(HttpStatus.OK).body(res));
     }
 }
