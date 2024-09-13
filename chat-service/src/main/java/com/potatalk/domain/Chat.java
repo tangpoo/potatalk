@@ -13,4 +13,19 @@ public class Chat {
     @Id
     private String id;
 
+    private Long roomId;
+
+    private String sender;
+
+    private String message;
+
+    private Chat(final Long roomId, final String sender, final String message) {
+        this.roomId = roomId;
+        this.sender = sender;
+        this.message = message;
+    }
+
+    public static Chat create(final Long roomId, final String sender, final String message) {
+        return new Chat(roomId, sender, message);
+    }
 }
