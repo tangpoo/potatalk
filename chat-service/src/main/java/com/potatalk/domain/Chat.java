@@ -1,5 +1,6 @@
 package com.potatalk.domain;
 
+import com.potatalk.dto.ChatMessageDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -13,19 +14,19 @@ public class Chat {
     @Id
     private String id;
 
-    private Long roomId;
+    private String roomId;
 
     private String sender;
 
     private String message;
 
-    private Chat(final Long roomId, final String sender, final String message) {
-        this.roomId = roomId;
-        this.sender = sender;
-        this.message = message;
+    private Chat(ChatMessageDto messageDto) {
+        this.roomId = messageDto.getRoomId();
+        this.sender = messageDto.getSender();
+        this.message = messageDto.getMessage();
     }
 
-    public static Chat create(final Long roomId, final String sender, final String message) {
-        return new Chat(roomId, sender, message);
+    public static Chat create(ChatMessageDto messageDto) {
+        return new Chat(messageDto);
     }
 }
