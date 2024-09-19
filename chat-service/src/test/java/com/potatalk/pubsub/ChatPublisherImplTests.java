@@ -14,8 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 public class ChatPublisherImplTests {
@@ -24,7 +26,7 @@ public class ChatPublisherImplTests {
     private ChatPublisherImpl chatPublisher;
 
     @Mock
-    private RedisTemplate<String, Object> redisTemplate;
+    private ReactiveRedisTemplate<String, Object> redisTemplate;
 
     @Mock
     private RedisTopicManager topicManager;
@@ -36,7 +38,8 @@ public class ChatPublisherImplTests {
             "message");
         ChannelTopic channelTopic = new ChannelTopic("chatroom:roomId-1234");
 
-        when(topicManager.getTopicForChatRoom("roomId-1234")).thenReturn(channelTopic);
+        when(topicManager.getTopicForChatRoom("roomId-1234")).thenReturn(Mono.just(channelTopic));
+        when(redisTemplate.convertAndSend(channelTopic.getTopic(), message)).thenReturn(Mono.just(1L));
 
         // Act
         chatPublisher.publish(message);
@@ -51,7 +54,7 @@ public class ChatPublisherImplTests {
         ChatMessageDto message = new ChatMessageDto("id-1234", "roomId-1234", "sender-1234",
             "message");
 
-        when(topicManager.getTopicForChatRoom("roomId-1234")).thenReturn(null);
+        when(topicManager.getTopicForChatRoom("roomId-1234")).thenReturn(Mono.empty());
 
         // Act
         chatPublisher.publish(message);
