@@ -20,6 +20,7 @@ public class StompHandler implements ChannelInterceptor {
             // 클라이언트가 WebSocket을 통해 연결할 때 처리 로직
         } else if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
             // 클라이언트가 채팅방에 입장할 때 처리 로직
+            log.info("SUBSCRIBE command for destination: " + accessor.getDestination());
         } else if (StompCommand.SEND.equals(accessor.getCommand())) {
             // 클라이언트가 메시지를 보낼 때 처리 로직
         } else if (StompCommand.UNSUBSCRIBE.equals(accessor.getCommand())) {
