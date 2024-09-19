@@ -8,6 +8,7 @@ import com.potatalk.chatroomservice.dto.ChatRoomInfoRes;
 import com.potatalk.chatroomservice.dto.CreateChatRoomDto;
 import com.potatalk.chatroomservice.exception.ChatRoomNotFound;
 import com.potatalk.chatroomservice.exception.PrivateKeyIsNotMatchedException;
+import com.potatalk.chatroomservice.publisher.ChatRoomPublisher;
 import com.potatalk.chatroomservice.repository.ChatRoomRepository;
 import com.potatalk.chatroomservice.repository.ParticipationRepository;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ParticipationRepository participationRepository;
     private final TransactionalOperator transactionalOperator;
+    private final ChatRoomPublisher chatRoomPublisher;
 
     public Mono<ChatRoom> createChatRoom(CreateChatRoomDto createChatRoomDto) {
         Long memberId = createChatRoomDto.getMemberId();
@@ -35,6 +37,8 @@ public class ChatRoomService {
                     Participation.create(chatRoom.getId(), memberId, ParticipationStatus.JOINED)
                 ).thenReturn(chatRoom)
             )
+            .flatMap(chatRoom -> chatRoomPublisher.sendAddTopicEvent("roomId-" + chatRoom.getId().toString())
+                .thenReturn(chatRoom))
             .as(transactionalOperator::transactional);
     }
 
