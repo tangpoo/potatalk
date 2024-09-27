@@ -16,10 +16,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,7 +31,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/api/v1/member")
+@RequestMapping("/api/v1/members")
 public class MemberController {
 
     private final MemberService memberService;
@@ -79,27 +81,26 @@ public class MemberController {
 
     @PostMapping("/friend/{friendId}")
     public Mono<ResponseEntity<Void>> friendRequest(
-        @AuthenticationPrincipal UserDetails userDetails,
+        @RequestHeader(required = false, value = "X-Username") String username,
         @PathVariable Long friendId) {
-        memberService.friendRequest(userDetails.getUsername(), friendId);
+        log.info("init controller with: " + username);
+        memberService.friendRequest(username, friendId);
 
         return Mono.just(ResponseEntity.noContent().build());
     }
 
     @GetMapping("/friend")
-    public Flux<ResponseEntity<MemberRes>> findAllFriend(@AuthenticationPrincipal UserDetails userDetails) {
-        return memberService.findAllFriend(userDetails.getUsername())
-            .map(res -> ResponseEntity
-                .ok()
-                .body(res)
-            );
+    public Flux<MemberRes> findAllFriend(
+        @RequestHeader(required = false, value = "X-Username") String username) {
+        log.info("init controller with: " + username);
+        return memberService.findAllFriend(username);
     }
 
     @PostMapping("/friend/{friendId}/accept")
     public Mono<ResponseEntity<Void>> acceptFriendRequest(
-        @AuthenticationPrincipal UserDetails userDetails,
+        @RequestHeader(required = false, value = "X-Username") String username,
         @PathVariable Long friendId) {
-        memberService.acceptFriendRequest(userDetails.getUsername(), friendId);
+        memberService.acceptFriendRequest(username, friendId);
 
         return Mono.just(ResponseEntity.noContent().build());
     }

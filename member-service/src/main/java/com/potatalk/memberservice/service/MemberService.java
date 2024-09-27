@@ -69,6 +69,7 @@ public class MemberService {
     }
 
     public void friendRequest(String username, final Long friendId) {
+        log.info("username:" + username);
         memberRepository
             .findByUsername(username)
             .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
