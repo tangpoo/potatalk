@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: api-gateway-netty
+  cloud:
+    gateway:
+      globalCors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - ${cors.url}
+            allow-credentials: true
+            allowedHeaders: '*'
+            allowedMethods:
+              - PUT
+              - GET
+              - POST
+              - DELETE
+              - OPTIONS
+      routes:
+        - id: member-service
+          uri: http://localhost:8080
+          predicates:
+            - Path=/api/v1/members/**
+          filters:
+            - JwtAuthorization
+        - id: chatRoom-Service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/chatroom/**
+          filters:
+            - JwtAuthorization
+        - id: chat-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/chat/**
+          filters:
+            - JwtAuthorization
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+
+jwt:
+  secret:
+    key: "7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg=="
+server:
+  port: 8083
