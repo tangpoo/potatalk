@@ -1,4 +1,4 @@
-## Potatalk는 비동기 채팅 서비스 입니다.
+## Potatalk는 실시간 채팅 서비스 입니다.
 
 
 ## Architecture
