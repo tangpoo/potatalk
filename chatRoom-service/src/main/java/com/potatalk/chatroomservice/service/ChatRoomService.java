@@ -50,20 +50,20 @@ public class ChatRoomService {
                 ChatRoomStatus.ONE_TO_ONE)
             .switchIfEmpty(Mono.defer(() -> {
                 ChatRoom chatRoom = ChatRoom.create(createChatRoomDto, ChatRoomStatus.ONE_TO_ONE);
-                return chatRoomRepository.save(chatRoom);
-            }))
-            .flatMap(savedRoom -> {
-                Participation memberParticipation = Participation.create(memberId,
-                    savedRoom.getId(), ParticipationStatus.JOINED);
-                Participation friendParticipation = Participation.create(friendId,
-                    savedRoom.getId(), ParticipationStatus.JOINED);
+                return chatRoomRepository.save(chatRoom)
+                    .flatMap(savedRoom -> {
+                        Participation memberParticipation = Participation.create(memberId,
+                            savedRoom.getId(), ParticipationStatus.JOINED);
+                        Participation friendParticipation = Participation.create(friendId,
+                            savedRoom.getId(), ParticipationStatus.JOINED);
 
-                return participationRepository.saveAll(
-                        Arrays.asList(memberParticipation, friendParticipation))
-                    .then(Mono.just(savedRoom));
-            })
-            .flatMap(chatRoom -> chatRoomPublisher.sendAddTopicEvent("roomId-" + chatRoom.getId().toString())
-                .thenReturn(chatRoom))
+                        return participationRepository.saveAll(
+                                Arrays.asList(memberParticipation, friendParticipation))
+                            .then(Mono.just(savedRoom));
+                    })
+                    .flatMap(savedRoom -> chatRoomPublisher.sendAddTopicEvent("roomId-" + savedRoom.getId().toString())
+                        .thenReturn(savedRoom));
+            }))
             .as(transactionalOperator::transactional);
     }
 
