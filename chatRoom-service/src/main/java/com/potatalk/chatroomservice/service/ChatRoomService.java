@@ -62,6 +62,8 @@ public class ChatRoomService {
                         Arrays.asList(memberParticipation, friendParticipation))
                     .then(Mono.just(savedRoom));
             })
+            .flatMap(chatRoom -> chatRoomPublisher.sendAddTopicEvent("roomId-" + chatRoom.getId().toString())
+                .thenReturn(chatRoom))
             .as(transactionalOperator::transactional);
     }
 
