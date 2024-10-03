@@ -25,14 +25,6 @@
 ## ERD
 ![Pasted image 20240827154537](https://github.com/user-attachments/assets/03d89f6a-7e47-4dc8-b586-354ba581fd46)
 
-## Sequence Diagram
-UserA
-
-![Pasted image 20240822231619](https://github.com/user-attachments/assets/23672c64-2be8-4ed4-bbb4-f0f04eb4cd89)
-
-UserB
-
-![Pasted image 20240816010422](https://github.com/user-attachments/assets/b3271f2b-fba1-4945-8128-4785023192cd)
 
 ---
 ## 프로젝트 관련 업로드
