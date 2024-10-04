@@ -4,6 +4,7 @@ import com.potatalk.memberservice.dto.MemberRes;
 import com.potatalk.memberservice.dto.MemberUpdateDto;
 import com.potatalk.memberservice.dto.SignInDto;
 import com.potatalk.memberservice.dto.SingUpDto;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,7 @@ import reactor.core.publisher.Mono;
 
 @Table("members")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
 
     @Id

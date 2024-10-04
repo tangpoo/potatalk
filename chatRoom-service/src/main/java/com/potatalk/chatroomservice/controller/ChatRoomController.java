@@ -60,10 +60,9 @@ public class ChatRoomController {
     }
 
     @GetMapping("/{memberId}/invite")
-    public Flux<ResponseEntity<Participation>> findAllInviteParticipation(
+    public Flux<Participation> findAllInviteParticipation(
         @PathVariable Long memberId) {
-        return chatRoomService.findAllInviteParticipation(memberId)
-            .map(res -> ResponseEntity.status(HttpStatus.OK).body(res));
+        return chatRoomService.findAllInviteParticipation(memberId);
     }
 
     @PostMapping("/{participationId}/accept")

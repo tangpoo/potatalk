@@ -128,7 +128,7 @@ public class ChatRoomService {
     }
 
     public Flux<Participation> findAllInviteParticipation(final Long memberId) {
-        return participationRepository.findAllByMemberId(memberId);
+        return participationRepository.findAllByParticipationStatusIsInvited(memberId, ParticipationStatus.INVITED);
     }
 
     public Mono<Participation> acceptInviteParticipation(final Long participationId) {
