@@ -88,8 +88,7 @@ public class ChatRoomController {
     }
 
     @GetMapping("/{memberId}")
-    public Flux<ResponseEntity<ChatRoom>> findAllByMemberId(@PathVariable Long memberId) {
-        return chatRoomService.findAllByMemberId(memberId)
-            .map(res -> ResponseEntity.status(HttpStatus.OK).body(res));
+    public Flux<ChatRoom> findAllByMemberId(@PathVariable Long memberId) {
+        return chatRoomService.findAllByMemberId(memberId);
     }
 }
