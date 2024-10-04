@@ -1,6 +1,7 @@
 package com.potatalk.service;
 
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.doReturn;
@@ -16,6 +17,7 @@ import com.potatalk.chatroomservice.domain.ParticipationStatus;
 import com.potatalk.chatroomservice.dto.ChatRoomInfoRes;
 import com.potatalk.chatroomservice.dto.CreateChatRoomDto;
 import com.potatalk.chatroomservice.exception.PrivateKeyIsNotMatchedException;
+import com.potatalk.chatroomservice.publisher.ChatRoomPublisher;
 import com.potatalk.chatroomservice.repository.ChatRoomRepository;
 import com.potatalk.chatroomservice.repository.ParticipationRepository;
 import com.potatalk.chatroomservice.service.ChatRoomService;
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
@@ -46,6 +49,9 @@ public class ChatRoomServiceTests {
     private ParticipationRepository participationRepository;
 
     @Mock
+    private ChatRoomPublisher chatRoomPublisher;
+
+    @Mock
     private TransactionalOperator transactionalOperator;
 
     @Test
@@ -55,12 +61,15 @@ public class ChatRoomServiceTests {
             null);
         final ChatRoom chatRoom = ChatRoomSteps.createChatRoom(createChatRoomDto,
             ChatRoomStatus.GROUP);
+        final ChatRoom spyChatRoom = spy(chatRoom);
+        doReturn(1L).when(spyChatRoom).getId();
         final Participation participation = ParticipationSteps.create(chatRoom.getCreateMemberId(),
             chatRoom.getId(), ParticipationStatus.JOINED);
 
-        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(Mono.just(chatRoom));
+        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(Mono.just(spyChatRoom));
         when(participationRepository.save(any(Participation.class))).thenReturn(
             Mono.just(participation));
+        when(chatRoomPublisher.sendAddTopicEvent(any())).thenReturn(Mono.just("roomId-1"));
         when(transactionalOperator.transactional(any(Mono.class))).thenAnswer(
             invocation -> invocation.getArgument(0));
 
@@ -68,7 +77,7 @@ public class ChatRoomServiceTests {
         final Mono<ChatRoom> result = chatRoomService.createChatRoom(createChatRoomDto);
 
         // Assert
-        StepVerifier.create(result).expectNext(chatRoom).verifyComplete();
+        StepVerifier.create(result).expectNext(spyChatRoom).verifyComplete();
     }
 
     @Test
@@ -77,18 +86,21 @@ public class ChatRoomServiceTests {
         final CreateChatRoomDto createChatRoomDto = ChatRoomSteps.createOneToOneChatRoomDto();
         final ChatRoom chatRoom = ChatRoomSteps.createChatRoom(createChatRoomDto,
             ChatRoomStatus.ONE_TO_ONE);
+        final ChatRoom spyChatRoom = spy(chatRoom);
+        doReturn(1L).when(spyChatRoom).getId();
         final Participation participation1 = ParticipationSteps.create(
             createChatRoomDto.getMemberId(),
-            chatRoom.getId(), ParticipationStatus.JOINED);
+            spyChatRoom.getId(), ParticipationStatus.JOINED);
         final Participation participation2 = ParticipationSteps.create(
             createChatRoomDto.getFriendId(),
-            chatRoom.getId(), ParticipationStatus.JOINED);
+            spyChatRoom.getId(), ParticipationStatus.JOINED);
 
         when(chatRoomRepository.findOneToOneChatRoom(createChatRoomDto.getMemberId(),
             createChatRoomDto.getFriendId(), ChatRoomStatus.ONE_TO_ONE)).thenReturn(Mono.empty());
-        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(Mono.just(chatRoom));
+        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(Mono.just(spyChatRoom));
         when(participationRepository.saveAll(anyList())).thenReturn(
             Flux.just(participation1, participation2));
+        when(chatRoomPublisher.sendAddTopicEvent(any())).thenReturn(Mono.just("roomId-1"));
         when(transactionalOperator.transactional(any(Mono.class))).thenAnswer(
             invocation -> invocation.getArgument(0));
 
@@ -96,7 +108,7 @@ public class ChatRoomServiceTests {
         final Mono<ChatRoom> result = chatRoomService.createOneToOneChatRoom(createChatRoomDto);
 
         // Assert
-        StepVerifier.create(result).expectNext(chatRoom).verifyComplete();
+        StepVerifier.create(result).expectNext(spyChatRoom).verifyComplete();
     }
 
     @Nested
@@ -115,8 +127,8 @@ public class ChatRoomServiceTests {
             final Participation participation = ParticipationSteps.create(memberId, roomId,
                 ParticipationStatus.JOINED);
 
-            when(chatRoomRepository.findById(anyLong())).thenReturn(Mono.just(chatRoom));
-            when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(Mono.just(chatRoom));
+            when(chatRoomRepository.findById(anyLong())).thenReturn(Mono.just(spyChatRoom));
+            when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(Mono.just(spyChatRoom));
             when(participationRepository.save(any(Participation.class))).thenReturn(
                 Mono.just(participation));
 
@@ -125,7 +137,7 @@ public class ChatRoomServiceTests {
                 secretKey);
 
             // Assert
-            StepVerifier.create(result).expectNext(chatRoom).verifyComplete();
+            StepVerifier.create(result).expectNext(spyChatRoom).verifyComplete();
             verify(chatRoomRepository, times(1)).findById(roomId);
             verify(chatRoomRepository, times(1)).save(any(ChatRoom.class));
             verify(participationRepository, times(1)).save(any(Participation.class));
