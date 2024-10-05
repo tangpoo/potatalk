@@ -2,8 +2,10 @@ package com.potatalk.pubsub;
 
 import com.potatalk.config.RedisTopicManager;
 import com.potatalk.dto.ChatMessageDto;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
@@ -20,10 +22,11 @@ public class ChatPublisherImpl implements ChatPublisher {
     public void publish(final ChatMessageDto message) {
         ChannelTopic topic = topicManager.getTopicForChatRoom(message.getRoomId()).block();
         if (topic != null) {
-            redisTemplate.convertAndSend(topic.getTopic(), message)
-                .doOnSuccess(result -> log.info("Message published: " + result))
-                .doOnError(e -> log.error("Failed to publish message", e))
-                .subscribe();
+            redisTemplate
+                    .convertAndSend(topic.getTopic(), message)
+                    .doOnSuccess(result -> log.info("Message published: " + result))
+                    .doOnError(e -> log.error("Failed to publish message", e))
+                    .subscribe();
         } else {
             log.warn("Topic for chat room {} dies not exist!", message.getRoomId());
         }

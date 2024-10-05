@@ -1,12 +1,15 @@
 package com.potatalk.memberservice.config.jwt;
 
 import com.potatalk.memberservice.domain.Member;
-import java.util.Collection;
-import java.util.Collections;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.Collections;
 
 @Getter
 @RequiredArgsConstructor
@@ -48,5 +51,4 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 }

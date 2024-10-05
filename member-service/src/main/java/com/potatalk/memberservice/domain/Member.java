@@ -2,9 +2,11 @@ package com.potatalk.memberservice.domain;
 
 import com.potatalk.memberservice.dto.MemberUpdateDto;
 import com.potatalk.memberservice.dto.SingUpDto;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -15,8 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
 
-    @Id
-    private Long id;
+    @Id private Long id;
 
     @Column("username")
     private String username;
@@ -37,8 +38,7 @@ public class Member {
         return new Member(singUpDto, passwordEncoder);
     }
 
-    public boolean passwordMatch(final String password,
-        final PasswordEncoder passwordEncoder) {
+    public boolean passwordMatch(final String password, final PasswordEncoder passwordEncoder) {
         return passwordEncoder.matches(password, this.password);
     }
 
