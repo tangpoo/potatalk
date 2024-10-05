@@ -1,6 +1,5 @@
 package com.potatalk.pubsub;
 
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -9,7 +8,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.potatalk.dto.ChatMessageDto;
 import com.potatalk.exception.MessageSendException;
-import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,10 +50,13 @@ public class ChatSubscriberImplTests {
         // Arrange
         String invalidMessage = "Invalid JSON format";
 
-        when(objectMapper.readValue(invalidMessage, ChatMessageDto.class)).thenThrow(new JsonProcessingException("Invalid JSON") {});
+        when(objectMapper.readValue(invalidMessage, ChatMessageDto.class)).thenThrow(
+            new JsonProcessingException("Invalid JSON") {
+            });
 
         // Act + Assert
-        Assertions.assertThrows(MessageSendException.class, () -> chatSubscriber.sendMessage(invalidMessage));
+        Assertions.assertThrows(MessageSendException.class,
+            () -> chatSubscriber.sendMessage(invalidMessage));
 
     }
 }

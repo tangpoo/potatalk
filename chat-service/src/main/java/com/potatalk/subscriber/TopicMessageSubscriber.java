@@ -22,11 +22,11 @@ public class TopicMessageSubscriber {
         ackMode = "MANUAL",
         id = "addTopicMessageListener",
         bindings =
-            @QueueBinding(
-                value = @Queue,
-                exchange = @Exchange(topicExchange),
-                key = "addTopic"
-            ))
+        @QueueBinding(
+            value = @Queue,
+            exchange = @Exchange(topicExchange),
+            key = "addTopic"
+        ))
     public Mono<Void> processAddTopicMessage(String topic) {
         log.info("Consuming addTopic    ===>    " + topic);
         return topicManager.addTopicForChatRoom(topic);

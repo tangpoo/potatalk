@@ -5,14 +5,13 @@ import com.potatalk.dto.ChatMessageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ChatPublisherImpl implements ChatPublisher{
+public class ChatPublisherImpl implements ChatPublisher {
 
     private final ReactiveRedisTemplate<String, Object> redisTemplate;
     private final RedisTopicManager topicManager;

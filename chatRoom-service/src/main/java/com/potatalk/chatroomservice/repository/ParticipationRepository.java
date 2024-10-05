@@ -13,7 +13,8 @@ public interface ParticipationRepository extends R2dbcRepository<Participation, 
     @Query("SELECT * FROM participation p "
         + "WHERE p.participation_status = :participationStatus "
         + "AND p.member_id = :memberId")
-    Flux<Participation> findAllByParticipationStatusIsInvited(@Param("memberId") Long memberId, @Param("participationStatus")
+    Flux<Participation> findAllByParticipationStatusIsInvited(@Param("memberId") Long memberId,
+        @Param("participationStatus")
         ParticipationStatus participationStatus);
 
     Mono<Participation> findByRoomIdAndMemberId(Long roomId, Long memberId);

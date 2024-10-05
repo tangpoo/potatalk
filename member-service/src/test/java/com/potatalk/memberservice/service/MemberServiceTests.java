@@ -21,7 +21,6 @@ import com.potatalk.memberservice.dto.SingUpDto;
 import com.potatalk.memberservice.repository.FriendRepository;
 import com.potatalk.memberservice.repository.MemberRepository;
 import com.potatalk.memberservice.steps.MemberSteps;
-import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,7 +71,8 @@ public class MemberServiceTests {
 
             // Assert
             StepVerifier.create(result)
-                .expectNextMatches(memberRes -> memberRes.getUsername().equals(request.getUsername()))
+                .expectNextMatches(
+                    memberRes -> memberRes.getUsername().equals(request.getUsername()))
                 .verifyComplete();
 
         }
@@ -231,7 +231,8 @@ public class MemberServiceTests {
 
         when(memberRepository.findByUsername(username)).thenReturn(Mono.just(spyMember));
         when(friendRepository.findAllFriendsByMemberId(1L)).thenReturn(Flux.just(friend1, friend2));
-        when(memberRepository.findAllById(anyList())).thenReturn(Flux.just(friendInfo1, friendInfo2));
+        when(memberRepository.findAllById(anyList())).thenReturn(
+            Flux.just(friendInfo1, friendInfo2));
 
         // Act
         final Flux<MemberRes> result = memberService.findAllFriend(username);
@@ -255,7 +256,8 @@ public class MemberServiceTests {
         doReturn(1L).when(spyMember).getId();
 
         when(memberRepository.findByUsername(username)).thenReturn(Mono.just(spyMember));
-        when(friendRepository.findByMemberIdAndFriendId(anyLong(), anyLong())).thenReturn(Mono.just(friend));
+        when(friendRepository.findByMemberIdAndFriendId(anyLong(), anyLong())).thenReturn(
+            Mono.just(friend));
         when(friendRepository.save(any(Friend.class))).thenReturn(Mono.just(friend));
 
         // Act

@@ -91,7 +91,9 @@ public class MemberService {
             .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
             .flatMapMany(member ->
                 friendRepository.findAllFriendsByMemberId(member.getId())
-                    .map(friend -> friend.getMemberId().equals(member.getId()) ? friend.getFriendId() : friend.getMemberId())
+                    .map(
+                        friend -> friend.getMemberId().equals(member.getId()) ? friend.getFriendId()
+                            : friend.getMemberId())
                     .collectList()
                     .flatMapMany(memberRepository::findAllById)
                     .map(MemberRes::from)
@@ -107,7 +109,6 @@ public class MemberService {
             .flatMap(friend -> friendRepository.save(friend.accept()))
             .then()
             .subscribe();
-
 
         //member 찾기 - memberId와 friendId로 friend 찾기 - friend 상태 변경 - save
     }

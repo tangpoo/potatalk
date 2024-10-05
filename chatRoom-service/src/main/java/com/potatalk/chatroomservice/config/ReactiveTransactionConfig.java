@@ -16,7 +16,8 @@ public class ReactiveTransactionConfig {
     }
 
     @Bean
-    public TransactionalOperator transactionalOperator(ReactiveTransactionManager transactionManager) {
+    public TransactionalOperator transactionalOperator(
+        ReactiveTransactionManager transactionManager) {
         return TransactionalOperator.create(transactionManager);
     }
 }

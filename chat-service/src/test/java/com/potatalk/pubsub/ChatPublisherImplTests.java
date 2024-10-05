@@ -15,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import reactor.core.publisher.Mono;
 
@@ -39,7 +38,8 @@ public class ChatPublisherImplTests {
         ChannelTopic channelTopic = new ChannelTopic("chatroom:roomId-1234");
 
         when(topicManager.getTopicForChatRoom("roomId-1234")).thenReturn(Mono.just(channelTopic));
-        when(redisTemplate.convertAndSend(channelTopic.getTopic(), message)).thenReturn(Mono.just(1L));
+        when(redisTemplate.convertAndSend(channelTopic.getTopic(), message)).thenReturn(
+            Mono.just(1L));
 
         // Act
         chatPublisher.publish(message);

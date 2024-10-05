@@ -37,7 +37,8 @@ public class ChatRoomService {
                     Participation.create(chatRoom.getId(), memberId, ParticipationStatus.JOINED)
                 ).thenReturn(chatRoom)
             )
-            .flatMap(chatRoom -> chatRoomPublisher.sendAddTopicEvent("roomId-" + chatRoom.getId().toString())
+            .flatMap(chatRoom -> chatRoomPublisher.sendAddTopicEvent(
+                    "roomId-" + chatRoom.getId().toString())
                 .thenReturn(chatRoom))
             .as(transactionalOperator::transactional);
     }
@@ -61,7 +62,8 @@ public class ChatRoomService {
                                 Arrays.asList(memberParticipation, friendParticipation))
                             .then(Mono.just(savedRoom));
                     })
-                    .flatMap(savedRoom -> chatRoomPublisher.sendAddTopicEvent("roomId-" + savedRoom.getId().toString())
+                    .flatMap(savedRoom -> chatRoomPublisher.sendAddTopicEvent(
+                            "roomId-" + savedRoom.getId().toString())
                         .thenReturn(savedRoom));
             }))
             .as(transactionalOperator::transactional);
@@ -117,9 +119,10 @@ public class ChatRoomService {
         ).thenReturn(chatRoom));
     }
 
-    private Mono<ChatRoom> handleExistingParticipation(final Participation participation, final ChatRoom chatRoom) {
+    private Mono<ChatRoom> handleExistingParticipation(final Participation participation,
+        final ChatRoom chatRoom) {
         if (participation.getParticipationStatus() == ParticipationStatus.INVITED
-        || participation.getParticipationStatus() == ParticipationStatus.JOINED) {
+            || participation.getParticipationStatus() == ParticipationStatus.JOINED) {
             return Mono.error(new IllegalArgumentException("해당 멤버는 이미 초대되었거나 참여 중입니다."));
         }
 
@@ -128,7 +131,8 @@ public class ChatRoomService {
     }
 
     public Flux<Participation> findAllInviteParticipation(final Long memberId) {
-        return participationRepository.findAllByParticipationStatusIsInvited(memberId, ParticipationStatus.INVITED);
+        return participationRepository.findAllByParticipationStatusIsInvited(memberId,
+            ParticipationStatus.INVITED);
     }
 
     public Mono<Participation> acceptInviteParticipation(final Long participationId) {
@@ -152,8 +156,8 @@ public class ChatRoomService {
             .switchIfEmpty(Mono.error(new ChatRoomNotFound("ChatRoom not found")))
             .flatMap(chatRoom ->
                 participationRepository.findAllIdByRoomId(roomId)
-                .collectList()
-                .map(participationIds -> ChatRoomInfoRes.from(chatRoom, participationIds)));
+                    .collectList()
+                    .map(participationIds -> ChatRoomInfoRes.from(chatRoom, participationIds)));
     }
 
     public Flux<ChatRoom> findAllByMemberId(Long memberId) {

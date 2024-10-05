@@ -4,7 +4,6 @@ import com.potatalk.memberservice.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 
 @Getter
 @AllArgsConstructor
