@@ -52,13 +52,13 @@ public class RedisTopicManager {
                                                         message ->
                                                                 log.info(
                                                                         "Received message from"
-                                                                            + " Redis: "
+                                                                                + " Redis: "
                                                                                 + message))
                                                 .doOnError(
                                                         e ->
                                                                 log.error(
                                                                         "Error while receiving"
-                                                                            + " Redis message",
+                                                                                + " Redis message",
                                                                         e));
 
                                 Disposable subscription =

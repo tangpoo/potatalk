@@ -31,7 +31,7 @@ public class ChatSubscriberImplTests {
         // Arrange
         String message =
                 "{\"id\":\"id-1234\", \"roomId\":\"roomId-1234\", \"sender\":\"sender-1234\","
-                    + " \"message\":\"Hello!\"}";
+                        + " \"message\":\"Hello!\"}";
         ChatMessageDto messageDto =
                 new ChatMessageDto("id-1234", "roomId-1234", "sender-1234", message);
 
