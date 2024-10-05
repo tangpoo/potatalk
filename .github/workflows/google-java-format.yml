@@ -29,4 +29,4 @@ jobs:
 
       - name: Push changes
         run: |
-          git push origin HEAD:${{ github.head_ref }}
+          git push --force origin HEAD:${{ github.head_ref }}  # 강제로 푸시
