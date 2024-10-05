@@ -49,7 +49,7 @@ jobs:
         with:
           title: 📝 테스트 커버리지 리포트
           paths: ${{ github.workspace }}/chatRoom-service/build/jacoco/index.xml
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
 
 #      # YML 파일 생성
