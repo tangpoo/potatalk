@@ -1,8 +1,8 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.3.2'
-	id 'io.spring.dependency-management' version '1.1.6'
-	id 'jacoco'
+    id 'java'
+    id 'org.springframework.boot' version '3.3.2'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'jacoco'
 }
 
 group = 'com.potatalk'
@@ -11,160 +11,160 @@ version = '0.0.1-SNAPSHOT'
 def jarFileName = 'member-service'
 
 bootJar {
-	archiveBaseName.set(jarFileName)
-	launchScript()
+    archiveBaseName.set(jarFileName)
+    launchScript()
 }
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 configurations {
-	integrationTestImplementation.extendsFrom implementation
-	integrationTestImplementation.extendsFrom testImplementation
-	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+    integrationTestImplementation.extendsFrom implementation
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 sourceSets {
-	integrationTest {
-		java.srcDir "$projectDir/src/integrationTest/java"
-		resources.srcDir "$projectDir/src/integrationTest/resources"
-		compileClasspath += main.output + test.output
-		runtimeClasspath += main.output + test.output
-	}
+    integrationTest {
+        java.srcDir "$projectDir/src/integrationTest/java"
+        resources.srcDir "$projectDir/src/integrationTest/resources"
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
 }
 
 task integrationTest(type: Test) {
-	description = 'Member-Service : Integration Test'
-	group = 'verification'
-	testClassesDirs = sourceSets.integrationTest.output.classesDirs
-	classpath = sourceSets.integrationTest.runtimeClasspath
-	useJUnitPlatform()
+    description = 'Member-Service : Integration Test'
+    group = 'verification'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    useJUnitPlatform()
 }
 
 check {
-	dependsOn integrationTest
+    dependsOn integrationTest
 }
 
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 jacoco {
-	toolVersion = "0.8.11"
+    toolVersion = "0.8.11"
 }
 
 jacocoTestReport {
-	dependsOn test
-	sourceSets sourceSets.main
-	executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+    dependsOn test
+    sourceSets sourceSets.main
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
 
-	reports {
-		xml.required.set(true)
-		html.required.set(true)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
 
-		afterEvaluate {
-			classDirectories.setFrom(files(classDirectories.files.collect {
-				fileTree(dir: it, excludes: [
-						"com/potatalk/Application.*"
-				])
-			}))
-		}
+        afterEvaluate {
+            classDirectories.setFrom(files(classDirectories.files.collect {
+                fileTree(dir: it, excludes: [
+                        "com/potatalk/Application.*"
+                ])
+            }))
+        }
 
-		xml.destination file("${buildDir}/jacoco/index.xml")
-		html.destination file("${buildDir}/jacoco/index.html")
-	}
+        xml.destination file("${buildDir}/jacoco/index.xml")
+        html.destination file("${buildDir}/jacoco/index.html")
+    }
 
-	finalizedBy jacocoTestCoverageVerification
+    finalizedBy jacocoTestCoverageVerification
 }
 
 jacocoTestCoverageVerification {
-	violationRules {
-		rule {
-			limit {
-				counter = 'INSTRUCTION'
-				value = 'COVEREDRATIO'
-			}
-		}
-		rule {
-			limit {
-				counter = 'BRANCH'
-				value = 'COVEREDRATIO'
-			}
-		}
-	}
+    violationRules {
+        rule {
+            limit {
+                counter = 'INSTRUCTION'
+                value = 'COVEREDRATIO'
+            }
+        }
+        rule {
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+            }
+        }
+    }
 }
 
 task generateJacocoTestCoverage(type: JacocoReport) {
-	group 'verification'
-	description 'Runs tests with coverage'
+    group 'verification'
+    description 'Runs tests with coverage'
 
-	dependsOn = [test, jacocoTestReport, jacocoTestCoverageVerification]
+    dependsOn = [test, jacocoTestReport, jacocoTestCoverageVerification]
 
-	tasks['jacocoTestCoverageVerification'].mustRunAfter(tasks['jacocoTestReport'])
-	tasks['jacocoTestReport'].mustRunAfter(tasks['test'])
+    tasks['jacocoTestCoverageVerification'].mustRunAfter(tasks['jacocoTestReport'])
+    tasks['jacocoTestReport'].mustRunAfter(tasks['test'])
 }
 
 apply plugin: 'idea'
 idea {
-	module {
-		testSourceDirs += project.sourceSets.integrationTest.java.srcDirs
-		testSourceDirs += project.sourceSets.integrationTest.resources.srcDirs
-	}
+    module {
+        testSourceDirs += project.sourceSets.integrationTest.java.srcDirs
+        testSourceDirs += project.sourceSets.integrationTest.resources.srcDirs
+    }
 }
 
 ext {
-	set('springCloudVersion', "2023.0.0")
+    set('springCloudVersion', "2023.0.0")
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 dependencies {
-	// JWT
-	compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
-	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
-	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
+    // JWT
+    compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
-	implementation 'org.springframework.boot:spring-boot-starter'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 //	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 //	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 //	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
-	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
-	implementation 'com.github.jasync-sql:jasync-r2dbc-mysql:2.2.4'
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    implementation 'com.github.jasync-sql:jasync-r2dbc-mysql:2.2.4'
 
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.testcontainers:junit-jupiter'
-	testImplementation 'io.projectreactor:reactor-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-	testImplementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.33'
-	testImplementation "org.testcontainers:mysql"
-	testImplementation 'dev.miku:r2dbc-mysql:0.8.2.RELEASE'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.33'
+    testImplementation "org.testcontainers:mysql"
+    testImplementation 'dev.miku:r2dbc-mysql:0.8.2.RELEASE'
 
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }

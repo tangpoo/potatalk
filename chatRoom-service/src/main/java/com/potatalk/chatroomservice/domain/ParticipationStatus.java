@@ -4,5 +4,4 @@ public enum ParticipationStatus {
     INVITED,
     JOINED,
     LEFT
-
 }

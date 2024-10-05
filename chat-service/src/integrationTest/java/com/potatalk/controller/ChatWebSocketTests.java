@@ -8,12 +8,7 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.potatalk.config.RedisTopicManager;
 import com.potatalk.dto.ChatMessageDto;
 import com.potatalk.subscriber.TopicMessageSubscriber;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,29 +35,33 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+
 @Testcontainers
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ChatWebSocketTests {
 
     @Container
     private static final GenericContainer<?> redisContainer =
-        new GenericContainer<>(DockerImageName.parse("redis:latest")).withExposedPorts(6379);
+            new GenericContainer<>(DockerImageName.parse("redis:latest")).withExposedPorts(6379);
 
     @Container
     private static final MongoDBContainer mongoContainer =
-        new MongoDBContainer("mongodb/mongodb-community-server:latest");
+            new MongoDBContainer("mongodb/mongodb-community-server:latest");
 
-    @Autowired
-    private RedisTopicManager topicManager;
+    @Autowired private RedisTopicManager topicManager;
 
-    @Autowired
-    private TopicMessageSubscriber subscriber;
+    @Autowired private TopicMessageSubscriber subscriber;
 
     private WebSocketStompClient stompClient;
     private String wsUrl;
 
-    @LocalServerPort
-    private int randomPort;
+    @LocalServerPort private int randomPort;
 
     @DynamicPropertySource
     static void redisProperties(DynamicPropertyRegistry registry) {
@@ -73,10 +72,10 @@ public class ChatWebSocketTests {
 
     @BeforeEach
     public void setup() {
-        wsUrl = String.format("ws://localhost:%d/ws/chat", randomPort);  // WebSocket 엔드포인트
+        wsUrl = String.format("ws://localhost:%d/ws/chat", randomPort); // WebSocket 엔드포인트
 
-        List<Transport> transports = Arrays.asList(
-            new WebSocketTransport(new StandardWebSocketClient()));
+        List<Transport> transports =
+                Arrays.asList(new WebSocketTransport(new StandardWebSocketClient()));
         stompClient = new WebSocketStompClient(new SockJsClient(transports));
         MappingJackson2MessageConverter messageConverter = new MappingJackson2MessageConverter();
         ObjectMapper objectMapper = messageConverter.getObjectMapper();
@@ -87,13 +86,17 @@ public class ChatWebSocketTests {
     @Test
     public void send_message_to_chat_room() throws Exception {
         // WebSocket 연결 설정
-        StompSession session = stompClient.connect(wsUrl, new WebSocketHttpHeaders(),
-            new StompSessionHandlerAdapter() {
-            }).get(5, TimeUnit.SECONDS);
+        StompSession session =
+                stompClient
+                        .connect(
+                                wsUrl,
+                                new WebSocketHttpHeaders(),
+                                new StompSessionHandlerAdapter() {})
+                        .get(5, TimeUnit.SECONDS);
 
         // 테스트용 메시지 생성
-        ChatMessageDto messageDto = new ChatMessageDto("id-1234", "roomId-1234", "sender-1234",
-            "message");
+        ChatMessageDto messageDto =
+                new ChatMessageDto("id-1234", "roomId-1234", "sender-1234", "message");
 
         // 토픽 등록
         subscriber.processAddTopicMessage(messageDto.getRoomId()).block();
@@ -102,18 +105,20 @@ public class ChatWebSocketTests {
         BlockingQueue<ChatMessageDto> blockingQueue = new LinkedBlockingQueue<>();
 
         // 구독 설정
-        Subscription subscribe = session.subscribe("/sub/chat/room/" + messageDto.getRoomId(),
-            new StompFrameHandler() {
-                @Override
-                public Type getPayloadType(StompHeaders headers) {
-                    return ChatMessageDto.class;
-                }
+        Subscription subscribe =
+                session.subscribe(
+                        "/sub/chat/room/" + messageDto.getRoomId(),
+                        new StompFrameHandler() {
+                            @Override
+                            public Type getPayloadType(StompHeaders headers) {
+                                return ChatMessageDto.class;
+                            }
 
-                @Override
-                public void handleFrame(StompHeaders headers, Object payload) {
-                    blockingQueue.add((ChatMessageDto) payload);
-                }
-            });
+                            @Override
+                            public void handleFrame(StompHeaders headers, Object payload) {
+                                blockingQueue.add((ChatMessageDto) payload);
+                            }
+                        });
 
         // WebSocket을 통해 메시지 발행
         session.send("/pub/chat/message", messageDto);

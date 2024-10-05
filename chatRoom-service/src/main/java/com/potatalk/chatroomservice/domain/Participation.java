@@ -1,9 +1,9 @@
 package com.potatalk.chatroomservice.domain;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -12,8 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Getter
 public class Participation {
 
-    @Id
-    private Long id;
+    @Id private Long id;
 
     private Long memberId;
 
@@ -21,13 +20,15 @@ public class Participation {
 
     private ParticipationStatus participationStatus;
 
-    private Participation(final Long memberId, final Long roomId, final ParticipationStatus participationStatus) {
+    private Participation(
+            final Long memberId, final Long roomId, final ParticipationStatus participationStatus) {
         this.memberId = memberId;
         this.roomId = roomId;
         this.participationStatus = participationStatus;
     }
 
-    public static Participation create(Long memberId, Long chatRoomId, ParticipationStatus participationStatus) {
+    public static Participation create(
+            Long memberId, Long chatRoomId, ParticipationStatus participationStatus) {
         return new Participation(memberId, chatRoomId, participationStatus);
     }
 
