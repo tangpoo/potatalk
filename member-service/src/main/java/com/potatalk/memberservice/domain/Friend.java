@@ -1,11 +1,14 @@
 package com.potatalk.memberservice.domain;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("friends")
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Friend {
 
     @Id

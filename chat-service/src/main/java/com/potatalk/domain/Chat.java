@@ -1,6 +1,7 @@
 package com.potatalk.domain;
 
 import com.potatalk.dto.ChatMessageDto;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -8,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Chat {
 
     @Id

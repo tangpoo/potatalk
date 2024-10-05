@@ -50,18 +50,20 @@ public class ChatRoomService {
                 ChatRoomStatus.ONE_TO_ONE)
             .switchIfEmpty(Mono.defer(() -> {
                 ChatRoom chatRoom = ChatRoom.create(createChatRoomDto, ChatRoomStatus.ONE_TO_ONE);
-                return chatRoomRepository.save(chatRoom);
-            }))
-            .flatMap(savedRoom -> {
-                Participation memberParticipation = Participation.create(memberId,
-                    savedRoom.getId(), ParticipationStatus.JOINED);
-                Participation friendParticipation = Participation.create(friendId,
-                    savedRoom.getId(), ParticipationStatus.JOINED);
+                return chatRoomRepository.save(chatRoom)
+                    .flatMap(savedRoom -> {
+                        Participation memberParticipation = Participation.create(memberId,
+                            savedRoom.getId(), ParticipationStatus.JOINED);
+                        Participation friendParticipation = Participation.create(friendId,
+                            savedRoom.getId(), ParticipationStatus.JOINED);
 
-                return participationRepository.saveAll(
-                        Arrays.asList(memberParticipation, friendParticipation))
-                    .then(Mono.just(savedRoom));
-            })
+                        return participationRepository.saveAll(
+                                Arrays.asList(memberParticipation, friendParticipation))
+                            .then(Mono.just(savedRoom));
+                    })
+                    .flatMap(savedRoom -> chatRoomPublisher.sendAddTopicEvent("roomId-" + savedRoom.getId().toString())
+                        .thenReturn(savedRoom));
+            }))
             .as(transactionalOperator::transactional);
     }
 
@@ -126,7 +128,7 @@ public class ChatRoomService {
     }
 
     public Flux<Participation> findAllInviteParticipation(final Long memberId) {
-        return participationRepository.findAllByMemberId(memberId);
+        return participationRepository.findAllByParticipationStatusIsInvited(memberId, ParticipationStatus.INVITED);
     }
 
     public Mono<Participation> acceptInviteParticipation(final Long participationId) {

@@ -15,7 +15,7 @@ public interface ChatRoomRepository extends R2dbcRepository<ChatRoom, Long> {
         + "JOIN parcitipation p2 ON cr.id = p2.chatRoomId "
         + "WHERE cr.chatRoomStatus = :chatRoomStatus "
         + "AND p1.memberId = :memberId AND p2.memberId = :friendId")
-    Mono<ChatRoom> findOneToOneChatRoom(@Param("memberId") Long memberId, @Param("friendId") Long friendId, ChatRoomStatus chatRoomStatus);
+    Mono<ChatRoom> findOneToOneChatRoom(@Param("memberId") Long memberId, @Param("friendId") Long friendId, @Param("chatRoomStatus") ChatRoomStatus chatRoomStatus);
 
     Flux<ChatRoom> findAllByCreateMemberId(Long memberId);
 }
