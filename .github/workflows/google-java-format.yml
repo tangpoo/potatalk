@@ -12,8 +12,6 @@ jobs:
   formatting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
       - uses: axel-op/googlejavaformat-action@v3
         with:
           args: "--replace --aosp"
