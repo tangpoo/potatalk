@@ -23,9 +23,7 @@ public class ChatPublisherImpl implements ChatPublisher {
         ChannelTopic topic = topicManager.getTopicForChatRoom(message.getRoomId()).block();
         log.info(topic.getTopic());
         if (topic != null) {
-            redisTemplate
-                    .convertAndSend(topic.getTopic(), message)
-                    .subscribe();
+            redisTemplate.convertAndSend(topic.getTopic(), message).subscribe();
         } else {
             log.warn("Topic for chat room {} dies not exist!", message.getRoomId());
         }

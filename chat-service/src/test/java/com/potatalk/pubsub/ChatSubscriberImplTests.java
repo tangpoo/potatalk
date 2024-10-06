@@ -32,8 +32,7 @@ public class ChatSubscriberImplTests {
         String message =
                 "{\"id\":\"id-1234\", \"roomId\":\"roomId-1234\", \"sender\":\"sender-1234\","
                         + " \"message\":\"Hello!\"}";
-        ChatMessageDto messageDto =
-                new ChatMessageDto("roomId-1234", "sender-1234", message);
+        ChatMessageDto messageDto = new ChatMessageDto("roomId-1234", "sender-1234", message);
 
         when(objectMapper.readValue(message, ChatMessageDto.class)).thenReturn(messageDto);
 

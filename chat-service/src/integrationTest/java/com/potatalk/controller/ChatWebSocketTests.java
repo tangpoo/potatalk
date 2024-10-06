@@ -95,8 +95,7 @@ public class ChatWebSocketTests {
                         .get(5, TimeUnit.SECONDS);
 
         // 테스트용 메시지 생성
-        ChatMessageDto messageDto =
-                new ChatMessageDto("roomId-1234", "sender-1234", "message");
+        ChatMessageDto messageDto = new ChatMessageDto("roomId-1234", "sender-1234", "message");
 
         // 토픽 등록
         subscriber.processAddTopicMessage(messageDto.getRoomId()).block();
@@ -133,6 +132,5 @@ public class ChatWebSocketTests {
 
         // 구독 취소
         subscribe.unsubscribe();
-
     }
 }
