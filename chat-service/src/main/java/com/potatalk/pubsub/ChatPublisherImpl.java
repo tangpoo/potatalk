@@ -21,7 +21,6 @@ public class ChatPublisherImpl implements ChatPublisher {
     @Override
     public void publish(final ChatMessageDto message) {
         ChannelTopic topic = topicManager.getTopicForChatRoom(message.getRoomId()).block();
-        log.info(topic.getTopic());
         if (topic != null) {
             redisTemplate
                     .convertAndSend(topic.getTopic(), message)
