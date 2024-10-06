@@ -21,6 +21,7 @@ public class ChatSubscriberImpl implements ChatSubscriber {
     @Override
     public void sendMessage(final String message) {
         try {
+            log.info("subscriber in:" + message);
             ChatMessageDto chatMessageDto = om.readValue(message, ChatMessageDto.class);
             messageTemplate.convertAndSend(
                     "/sub/chat/room/" + chatMessageDto.getRoomId(), chatMessageDto);

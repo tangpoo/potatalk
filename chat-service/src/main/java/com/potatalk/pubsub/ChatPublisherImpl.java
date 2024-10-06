@@ -22,11 +22,7 @@ public class ChatPublisherImpl implements ChatPublisher {
     public void publish(final ChatMessageDto message) {
         ChannelTopic topic = topicManager.getTopicForChatRoom(message.getRoomId()).block();
         if (topic != null) {
-            redisTemplate
-                    .convertAndSend(topic.getTopic(), message)
-                    .doOnSuccess(result -> log.info("Message published: " + result))
-                    .doOnError(e -> log.error("Failed to publish message", e))
-                    .subscribe();
+            redisTemplate.convertAndSend(topic.getTopic(), message).subscribe();
         } else {
             log.warn("Topic for chat room {} dies not exist!", message.getRoomId());
         }
