@@ -33,7 +33,7 @@ public class ChatPublisherImplTests {
     void publish_should_send_message_to_correct_topic() {
         // Arrange
         ChatMessageDto message =
-                new ChatMessageDto("id-1234", "roomId-1234", "sender-1234", "message");
+                new ChatMessageDto("roomId-1234", "sender-1234", "message");
         ChannelTopic channelTopic = new ChannelTopic("chatroom:roomId-1234");
 
         when(topicManager.getTopicForChatRoom("roomId-1234")).thenReturn(Mono.just(channelTopic));
@@ -51,7 +51,7 @@ public class ChatPublisherImplTests {
     void publish_should_not_send_message_if_topic_does_not_exist() {
         // Arrange
         ChatMessageDto message =
-                new ChatMessageDto("id-1234", "roomId-1234", "sender-1234", "message");
+                new ChatMessageDto("roomId-1234", "sender-1234", "message");
 
         when(topicManager.getTopicForChatRoom("roomId-1234")).thenReturn(Mono.empty());
 

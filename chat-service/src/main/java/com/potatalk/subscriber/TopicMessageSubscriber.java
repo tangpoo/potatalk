@@ -31,6 +31,10 @@ public class TopicMessageSubscriber {
                             key = "addTopic"))
     public Mono<Void> processAddTopicMessage(String topic) {
         log.info("Consuming addTopic    ===>    " + topic);
-        return topicManager.addTopicForChatRoom(topic);
+        return topicManager.addTopicForChatRoom(topic)
+            .doOnNext(result -> System.out.println("Reactive process onNext: " + result))
+            .doOnSuccess(System.out::println)
+            .doOnError(e -> System.out.println(e.getMessage()));
+
     }
 }

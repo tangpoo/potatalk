@@ -9,8 +9,6 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 public class ChatMessageDto {
 
-    @Id private String id;
-
     private String roomId;
 
     private String sender;
