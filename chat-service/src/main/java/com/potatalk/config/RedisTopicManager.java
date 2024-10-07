@@ -20,25 +20,11 @@ public class RedisTopicManager {
     public static final String chatRoomTopic = "chatroom:";
     private final ReactiveRedisMessageListenerContainer listenerContainer;
     private final MessageListenerAdapter messageListenerAdapter;
-    private final ReactiveRedisTemplate<String, Object> redisTemplate;
-
-    // 채팅방에 대한 채널을 Redis에 먼저 등록하고 구독을 시작하는 메서드
-    public Mono<Void> addTopicForChatRoom(String chatRoomId) {
-        log.info("Adding topic for chat room: " + chatRoomId);
-
-        // Redis에 채널을 등록
-        ChannelTopic newTopic = new ChannelTopic(chatRoomTopic + chatRoomId);
-
-        return redisTemplate
-                .convertAndSend(newTopic.getTopic(), "init") // 메시지를 보내서 Redis에 채널을 등록
-                .doOnSuccess(
-                        result -> log.info("Redis channel registered for: " + newTopic.getTopic()))
-                .doOnError(e -> log.error("Error sending message to Redis: " + e.getMessage()))
-                .then(Mono.fromRunnable(() -> subscribeToTopic(newTopic))); // 구독을 시작
-    }
 
     // 해당 채널을 구독하는 메서드
-    private void subscribeToTopic(ChannelTopic topic) {
+    public void subscribeToTopic(String chatRoomId) {
+        ChannelTopic topic = new ChannelTopic(chatRoomTopic + chatRoomId);
+
         listenerContainer
                 .receive(topic)
                 .map(message -> (String) message.getMessage())
