@@ -98,7 +98,7 @@ public class ChatWebSocketTests {
         ChatMessageDto messageDto = new ChatMessageDto("roomId-1234", "sender-1234", "message");
 
         // 토픽 등록
-        subscriber.processAddTopicMessage(messageDto.getRoomId()).block();
+        subscriber.processAddTopicMessage(messageDto.getRoomId());
 
         // 메세지를 받을 큐 설정
         BlockingQueue<ChatMessageDto> blockingQueue = new LinkedBlockingQueue<>();
