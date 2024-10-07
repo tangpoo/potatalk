@@ -11,8 +11,6 @@ import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
-import reactor.core.publisher.Mono;
-
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -29,12 +27,8 @@ public class TopicMessageSubscriber {
                             value = @Queue,
                             exchange = @Exchange(topicExchange),
                             key = "addTopic"))
-    public Mono<Void> processAddTopicMessage(String topic) {
+    public void processAddTopicMessage(String topic) {
         log.info("Consuming addTopic    ===>    " + topic);
-        return topicManager
-                .addTopicForChatRoom(topic)
-                .doOnNext(result -> System.out.println("Reactive process onNext: " + result))
-                .doOnSuccess(System.out::println)
-                .doOnError(e -> System.out.println(e.getMessage()));
+        topicManager.subscribeToTopic(topic);
     }
 }
