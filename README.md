@@ -37,6 +37,6 @@
 
 [설계 과정](https://tangpoo.tistory.com/194)
 
-Spring WebSocket 실시간 채팅 구현(todo)
+[Spring WebSocket 실시간 채팅 구현](https://tangpoo.tistory.com/196)
 
-API-Gateway 인증/인가 적용(todo)
+[API-Gateway 인증/인가 적용](https://tangpoo.tistory.com/197)
