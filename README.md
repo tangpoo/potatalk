@@ -11,7 +11,7 @@
 ## 주요 기술
 
 - 언어 : Java 17
-- 프레임워크 : Spring Boot, Spring WebFlux
+- 프레임워크 : Spring Boot, Spring WebFlux, Spring WebSocket
 - 빌드 도구 : Gradle
 - 배포 및 운영 :
     - 서버 : AWS EC2, Docker
