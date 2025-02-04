@@ -18,7 +18,7 @@
     - CI/CD : GitHub Actions
     - 데이터베이스 : MySQL, MongoDB
     - 캐시 : Redis (AWS Elastic Cache)
-    - 메시징 시스템 : RabbitMQ
+    - 메시징 시스템 : RabbitMQ, Redis (Pub/Sub)
 - 모니터링 : Prometheus + Grafana, CloudWatch, Brave, Zipkin
 - 테스트 및 품질 : JaCoCo
 
