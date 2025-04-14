@@ -1,7 +1,6 @@
 package com.potatalk.config;
 
 import com.potatalk.pubsub.ChatSubscriber;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,13 +29,13 @@ public class RedisConfig {
 
     @Bean
     public ReactiveRedisTemplate<String, Object> reactiveRedisTemplate(
-            ReactiveRedisConnectionFactory factory) {
+        ReactiveRedisConnectionFactory factory) {
 
         Jackson2JsonRedisSerializer<Object> serializer =
-                new Jackson2JsonRedisSerializer<>(Object.class);
+            new Jackson2JsonRedisSerializer<>(Object.class);
 
         RedisSerializationContext.RedisSerializationContextBuilder<String, Object> builder =
-                RedisSerializationContext.newSerializationContext(new StringRedisSerializer());
+            RedisSerializationContext.newSerializationContext(new StringRedisSerializer());
 
         RedisSerializationContext<String, Object> context = builder.value(serializer).build();
         return new ReactiveRedisTemplate<>(factory, context);
@@ -44,7 +43,7 @@ public class RedisConfig {
 
     @Bean
     public ReactiveRedisMessageListenerContainer redisMessageListenerContainer(
-            ReactiveRedisConnectionFactory connectionFactory) {
+        ReactiveRedisConnectionFactory connectionFactory) {
         return new ReactiveRedisMessageListenerContainer(connectionFactory);
     }
 

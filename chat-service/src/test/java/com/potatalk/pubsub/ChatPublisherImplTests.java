@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import com.potatalk.config.RedisTopicManager;
 import com.potatalk.dto.ChatMessageDto;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,17 +16,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-
 import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 public class ChatPublisherImplTests {
 
-    @InjectMocks private ChatPublisherImpl chatPublisher;
+    @InjectMocks
+    private ChatPublisherImpl chatPublisher;
 
-    @Mock private ReactiveRedisTemplate<String, Object> redisTemplate;
+    @Mock
+    private ReactiveRedisTemplate<String, Object> redisTemplate;
 
-    @Mock private RedisTopicManager topicManager;
+    @Mock
+    private RedisTopicManager topicManager;
 
     @Test
     void publish_should_send_message_to_correct_topic() {
@@ -37,7 +38,7 @@ public class ChatPublisherImplTests {
 
         when(topicManager.getTopicForChatRoom("roomId-1234")).thenReturn(Mono.just(channelTopic));
         when(redisTemplate.convertAndSend(channelTopic.getTopic(), message))
-                .thenReturn(Mono.just(1L));
+            .thenReturn(Mono.just(1L));
 
         // Act
         chatPublisher.publish(message);

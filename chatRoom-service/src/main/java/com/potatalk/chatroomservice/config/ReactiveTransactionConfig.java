@@ -1,7 +1,6 @@
 package com.potatalk.chatroomservice.config;
 
 import io.r2dbc.spi.ConnectionFactory;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.r2dbc.connection.R2dbcTransactionManager;
@@ -18,7 +17,7 @@ public class ReactiveTransactionConfig {
 
     @Bean
     public TransactionalOperator transactionalOperator(
-            ReactiveTransactionManager transactionManager) {
+        ReactiveTransactionManager transactionManager) {
         return TransactionalOperator.create(transactionManager);
     }
 }

@@ -22,7 +22,7 @@ import com.potatalk.chatroomservice.repository.ParticipationRepository;
 import com.potatalk.chatroomservice.service.ChatRoomService;
 import com.potatalk.steps.ChatRoomSteps;
 import com.potatalk.steps.ParticipationSteps;
-
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,45 +30,47 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.reactive.TransactionalOperator;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.List;
-
 @ExtendWith(MockitoExtension.class)
 public class ChatRoomServiceTests {
 
-    @InjectMocks private ChatRoomService chatRoomService;
+    @InjectMocks
+    private ChatRoomService chatRoomService;
 
-    @Mock private ChatRoomRepository chatRoomRepository;
+    @Mock
+    private ChatRoomRepository chatRoomRepository;
 
-    @Mock private ParticipationRepository participationRepository;
+    @Mock
+    private ParticipationRepository participationRepository;
 
-    @Mock private ChatRoomPublisher chatRoomPublisher;
+    @Mock
+    private ChatRoomPublisher chatRoomPublisher;
 
-    @Mock private TransactionalOperator transactionalOperator;
+    @Mock
+    private TransactionalOperator transactionalOperator;
 
     @Test
     void create_group_chat_room() {
         // Arrange
         final CreateChatRoomDto createChatRoomDto =
-                ChatRoomSteps.createGroupChatRoomDto(false, null);
+            ChatRoomSteps.createGroupChatRoomDto(false, null);
         final ChatRoom chatRoom =
-                ChatRoomSteps.createChatRoom(createChatRoomDto, ChatRoomStatus.GROUP);
+            ChatRoomSteps.createChatRoom(createChatRoomDto, ChatRoomStatus.GROUP);
         final ChatRoom spyChatRoom = spy(chatRoom);
         doReturn(1L).when(spyChatRoom).getId();
         final Participation participation =
-                ParticipationSteps.create(
-                        chatRoom.getCreateMemberId(), chatRoom.getId(), ParticipationStatus.JOINED);
+            ParticipationSteps.create(
+                chatRoom.getCreateMemberId(), chatRoom.getId(), ParticipationStatus.JOINED);
 
         when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(Mono.just(spyChatRoom));
         when(participationRepository.save(any(Participation.class)))
-                .thenReturn(Mono.just(participation));
+            .thenReturn(Mono.just(participation));
         when(chatRoomPublisher.sendAddTopicEvent(any())).thenReturn(Mono.just("roomId-1"));
         when(transactionalOperator.transactional(any(Mono.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+            .thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         final Mono<ChatRoom> result = chatRoomService.createChatRoom(createChatRoomDto);
@@ -82,31 +84,31 @@ public class ChatRoomServiceTests {
         // Arrange
         final CreateChatRoomDto createChatRoomDto = ChatRoomSteps.createOneToOneChatRoomDto();
         final ChatRoom chatRoom =
-                ChatRoomSteps.createChatRoom(createChatRoomDto, ChatRoomStatus.ONE_TO_ONE);
+            ChatRoomSteps.createChatRoom(createChatRoomDto, ChatRoomStatus.ONE_TO_ONE);
         final ChatRoom spyChatRoom = spy(chatRoom);
         doReturn(1L).when(spyChatRoom).getId();
         final Participation participation1 =
-                ParticipationSteps.create(
-                        createChatRoomDto.getMemberId(),
-                        spyChatRoom.getId(),
-                        ParticipationStatus.JOINED);
+            ParticipationSteps.create(
+                createChatRoomDto.getMemberId(),
+                spyChatRoom.getId(),
+                ParticipationStatus.JOINED);
         final Participation participation2 =
-                ParticipationSteps.create(
-                        createChatRoomDto.getFriendId(),
-                        spyChatRoom.getId(),
-                        ParticipationStatus.JOINED);
+            ParticipationSteps.create(
+                createChatRoomDto.getFriendId(),
+                spyChatRoom.getId(),
+                ParticipationStatus.JOINED);
 
         when(chatRoomRepository.findOneToOneChatRoom(
-                        createChatRoomDto.getMemberId(),
-                        createChatRoomDto.getFriendId(),
-                        ChatRoomStatus.ONE_TO_ONE))
-                .thenReturn(Mono.empty());
+            createChatRoomDto.getMemberId(),
+            createChatRoomDto.getFriendId(),
+            ChatRoomStatus.ONE_TO_ONE))
+            .thenReturn(Mono.empty());
         when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(Mono.just(spyChatRoom));
         when(participationRepository.saveAll(anyList()))
-                .thenReturn(Flux.just(participation1, participation2));
+            .thenReturn(Flux.just(participation1, participation2));
         when(chatRoomPublisher.sendAddTopicEvent(any())).thenReturn(Mono.just("roomId-1"));
         when(transactionalOperator.transactional(any(Mono.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+            .thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         final Mono<ChatRoom> result = chatRoomService.createOneToOneChatRoom(createChatRoomDto);
@@ -129,12 +131,12 @@ public class ChatRoomServiceTests {
             final ChatRoom spyChatRoom = spy(chatRoom);
             doReturn(1L).when(spyChatRoom).getId();
             final Participation participation =
-                    ParticipationSteps.create(memberId, roomId, ParticipationStatus.JOINED);
+                ParticipationSteps.create(memberId, roomId, ParticipationStatus.JOINED);
 
             when(chatRoomRepository.findById(anyLong())).thenReturn(Mono.just(spyChatRoom));
             when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(Mono.just(spyChatRoom));
             when(participationRepository.save(any(Participation.class)))
-                    .thenReturn(Mono.just(participation));
+                .thenReturn(Mono.just(participation));
 
             // Act
             final Mono<ChatRoom> result = chatRoomService.joinChatRoom(roomId, memberId, secretKey);
@@ -159,7 +161,7 @@ public class ChatRoomServiceTests {
 
             // Act
             final Mono<ChatRoom> result =
-                    chatRoomService.joinChatRoom(roomId, memberId, diffSecretKey);
+                chatRoomService.joinChatRoom(roomId, memberId, diffSecretKey);
 
             // Assert
             StepVerifier.create(result).expectError(PrivateKeyIsNotMatchedException.class).verify();
@@ -181,13 +183,13 @@ public class ChatRoomServiceTests {
             ChatRoom spyChatRoom = spy(chatRoom);
             doReturn(1L).when(spyChatRoom).getId();
             Participation participation =
-                    ParticipationSteps.create(memberId, roomId, ParticipationStatus.INVITED);
+                ParticipationSteps.create(memberId, roomId, ParticipationStatus.INVITED);
 
             when(chatRoomRepository.findById(roomId)).thenReturn(Mono.just(spyChatRoom));
             when(participationRepository.findByRoomIdAndMemberId(roomId, memberId))
-                    .thenReturn(Mono.empty());
+                .thenReturn(Mono.empty());
             when(participationRepository.save(any(Participation.class)))
-                    .thenReturn(Mono.just(participation));
+                .thenReturn(Mono.just(participation));
 
             // Act
             final Mono<ChatRoom> result = chatRoomService.inviteChatRoom(roomId, memberId);
@@ -208,11 +210,11 @@ public class ChatRoomServiceTests {
             ChatRoom spyChatRoom = spy(chatRoom);
             doReturn(1L).when(spyChatRoom).getId();
             Participation participation =
-                    ParticipationSteps.create(memberId, roomId, ParticipationStatus.INVITED);
+                ParticipationSteps.create(memberId, roomId, ParticipationStatus.INVITED);
 
             when(chatRoomRepository.findById(roomId)).thenReturn(Mono.just(spyChatRoom));
             when(participationRepository.findByRoomIdAndMemberId(roomId, memberId))
-                    .thenReturn(Mono.just(participation));
+                .thenReturn(Mono.just(participation));
 
             // Act
             final Mono<ChatRoom> result = chatRoomService.inviteChatRoom(roomId, memberId);
@@ -233,13 +235,13 @@ public class ChatRoomServiceTests {
             ChatRoom spyChatRoom = spy(chatRoom);
             doReturn(1L).when(spyChatRoom).getId();
             Participation participation =
-                    ParticipationSteps.create(memberId, roomId, ParticipationStatus.LEFT);
+                ParticipationSteps.create(memberId, roomId, ParticipationStatus.LEFT);
 
             when(chatRoomRepository.findById(roomId)).thenReturn(Mono.just(spyChatRoom));
             when(participationRepository.findByRoomIdAndMemberId(roomId, memberId))
-                    .thenReturn(Mono.just(participation));
+                .thenReturn(Mono.just(participation));
             when(participationRepository.save(any(Participation.class)))
-                    .thenReturn(Mono.just(participation));
+                .thenReturn(Mono.just(participation));
 
             // Act
             final Mono<ChatRoom> result = chatRoomService.inviteChatRoom(roomId, memberId);
@@ -280,34 +282,34 @@ public class ChatRoomServiceTests {
 
         when(chatRoomRepository.findById(roomId)).thenReturn(Mono.just(chatRoom));
         when(participationRepository.findAllIdByRoomId(roomId))
-                .thenReturn(Flux.fromIterable(participationIds));
+            .thenReturn(Flux.fromIterable(participationIds));
 
         // Act
         Mono<ChatRoomInfoRes> result = chatRoomService.findChatRoomInfo(roomId);
 
         // Assert
         StepVerifier.create(result)
-                .expectNextMatches(
-                        chatRoomInfoRes ->
-                                chatRoomInfoRes.getParticipationIds().equals(participationIds)
-                                        && chatRoomInfoRes
-                                                .getCreateMemberId()
-                                                .equals(chatRoom.getCreateMemberId())
-                                        && chatRoomInfoRes
-                                                .getRoomName()
-                                                .equals(chatRoom.getRoomName())
-                                        && chatRoomInfoRes
-                                                .getIsPrivate()
-                                                .equals(chatRoom.getIsPrivate())
-                                        && chatRoomInfoRes
-                                                .getChatRoomStatus()
-                                                .equals(chatRoom.getChatRoomStatus())
-                                        && chatRoomInfoRes
-                                                .getMaxParticipation()
-                                                .equals(chatRoom.getMaxParticipation())
-                                        && chatRoomInfoRes
-                                                .getParticipationCount()
-                                                .equals(chatRoom.getParticipationCount()))
-                .verifyComplete();
+            .expectNextMatches(
+                chatRoomInfoRes ->
+                    chatRoomInfoRes.getParticipationIds().equals(participationIds)
+                        && chatRoomInfoRes
+                        .getCreateMemberId()
+                        .equals(chatRoom.getCreateMemberId())
+                        && chatRoomInfoRes
+                        .getRoomName()
+                        .equals(chatRoom.getRoomName())
+                        && chatRoomInfoRes
+                        .getIsPrivate()
+                        .equals(chatRoom.getIsPrivate())
+                        && chatRoomInfoRes
+                        .getChatRoomStatus()
+                        .equals(chatRoom.getChatRoomStatus())
+                        && chatRoomInfoRes
+                        .getMaxParticipation()
+                        .equals(chatRoom.getMaxParticipation())
+                        && chatRoomInfoRes
+                        .getParticipationCount()
+                        .equals(chatRoom.getParticipationCount()))
+            .verifyComplete();
     }
 }
