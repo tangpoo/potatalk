@@ -75,9 +75,7 @@ public class ChatWebSocketTests {
     public void setup() {
         wsUrl = String.format("ws://localhost:%d/ws/chat", randomPort); // WebSocket 엔드포인트
 
-        List<Transport> transports =
-            Arrays.asList(new WebSocketTransport(new StandardWebSocketClient()));
-        stompClient = new WebSocketStompClient(new SockJsClient(transports));
+        stompClient = new WebSocketStompClient(new StandardWebSocketClient());
         MappingJackson2MessageConverter messageConverter = new MappingJackson2MessageConverter();
         ObjectMapper objectMapper = messageConverter.getObjectMapper();
         objectMapper.registerModules(new JavaTimeModule(), new ParameterNamesModule());
