@@ -10,7 +10,7 @@ spring:
     host: 127.0.0.1
     port: 5672
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: host.docker.internal:9092
     consumer:
       group-id: potatalk-group
       auto-offset-reset: earliest
