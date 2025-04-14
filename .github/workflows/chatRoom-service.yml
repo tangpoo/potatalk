@@ -63,7 +63,7 @@ jobs:
 #      - name: 도커 이미지 빌드
 #        run: |
 #          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-#          docker build -t ${{ secrets.DOCKER_USERNAME }}/delivery-info-service:latest -f delivery-info-service/Dockerfile delivery-info-service
+#          docker build -t ${{ secrets.DOCKER_USERNAME }}/delivery-info-service:latest -f delivery-info-service/docker-compose.yml delivery-info-service
 #          docker push ${{ secrets.DOCKER_USERNAME }}/delivery-info-service:latest
 #
 #      - name: AWS 배포
