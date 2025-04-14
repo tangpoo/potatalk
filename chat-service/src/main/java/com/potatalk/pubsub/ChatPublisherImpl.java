@@ -2,6 +2,7 @@ package com.potatalk.pubsub;
 
 import com.potatalk.config.RedisTopicManager;
 import com.potatalk.dto.ChatMessageDto;
+import com.potatalk.metric.WebSocketMetrics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
@@ -15,12 +16,15 @@ public class ChatPublisherImpl implements ChatPublisher {
 
     private final ReactiveRedisTemplate<String, Object> redisTemplate;
     private final RedisTopicManager topicManager;
+    private final WebSocketMetrics webSocketMetrics;
 
     @Override
     public void publish(final ChatMessageDto message) {
         ChannelTopic topic = topicManager.getTopicForChatRoom(message.getRoomId()).block();
         if (topic != null) {
-            redisTemplate.convertAndSend(topic.getTopic(), message).subscribe();
+            webSocketMetrics.recordMessage(
+                () -> redisTemplate.convertAndSend(topic.getTopic(), message).subscribe()
+            );
         } else {
             log.warn("Topic for chat room {} dies not exist!", message.getRoomId());
         }

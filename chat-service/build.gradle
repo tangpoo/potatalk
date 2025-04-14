@@ -144,7 +144,10 @@ dependencies {
     implementation 'org.webjars:stomp-websocket:2.3.3-1'
 
     // Monitoring
-    //    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Tracing
     //    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
     //    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
 

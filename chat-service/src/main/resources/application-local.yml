@@ -20,6 +20,13 @@ spring:
     consumer:
       group-id: potatalk-group
       auto-offset-reset: earliest
+
+management:
+  endpoints:
+     web:
+      exposure:
+        include: "*"
+
 logging:
   level:
     org.springframework.r2dbc.core: debug

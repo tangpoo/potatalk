@@ -22,12 +22,3 @@ services:
       - ./grafana/volume:/var/lib/grafana
     restart: always
     user: "$UID:$GID"
-
-  kafka-exporter:
-    image: danielqsj/kafka-exporter
-    container_name: kafka-exporter
-    ports:
-      - "9308:9308"
-    command:
-      - "--kafka.server=kafka:9092"   # Kafka 컨테이너 이름과 포트 확인
-    restart: always

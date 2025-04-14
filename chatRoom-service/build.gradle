@@ -142,8 +142,7 @@ dependencies {
     // RabbitMQ
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
 
-    // Monitoring
-    //    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // Tracing
     //    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
     //    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
 
