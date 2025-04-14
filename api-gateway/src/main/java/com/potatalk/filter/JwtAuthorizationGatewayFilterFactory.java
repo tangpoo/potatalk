@@ -1,8 +1,11 @@
 package com.potatalk.filter;
 
 import com.potatalk.util.JwtUtil;
+
 import io.jsonwebtoken.Claims;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -14,7 +17,7 @@ import org.springframework.util.StringUtils;
 @Component
 @Slf4j
 public class JwtAuthorizationGatewayFilterFactory
-    extends AbstractGatewayFilterFactory<JwtAuthorizationGatewayFilterFactory.Config> {
+        extends AbstractGatewayFilterFactory<JwtAuthorizationGatewayFilterFactory.Config> {
 
     private final JwtUtil jwtUtil;
 
@@ -57,7 +60,7 @@ public class JwtAuthorizationGatewayFilterFactory
 
                 // 토큰의 정보를 요청 헤더에 추가
                 ServerHttpRequest mutatedRequest =
-                    exchange.getRequest().mutate().header("X-Username", username).build();
+                        exchange.getRequest().mutate().header("X-Username", username).build();
 
                 log.info(String.format("User %s joined the server", username));
 

@@ -21,6 +21,7 @@ import com.potatalk.memberservice.dto.SingUpDto;
 import com.potatalk.memberservice.repository.FriendRepository;
 import com.potatalk.memberservice.repository.MemberRepository;
 import com.potatalk.memberservice.steps.MemberSteps;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +33,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -39,20 +41,15 @@ import reactor.test.StepVerifier;
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTests {
 
-    @InjectMocks
-    private MemberService memberService;
+    @InjectMocks private MemberService memberService;
 
-    @Mock
-    private MemberRepository memberRepository;
+    @Mock private MemberRepository memberRepository;
 
-    @Mock
-    private FriendRepository friendRepository;
+    @Mock private FriendRepository friendRepository;
 
-    @Mock
-    private JwtTokenProvider jwtTokenProvider;
+    @Mock private JwtTokenProvider jwtTokenProvider;
 
-    @Spy
-    private BCryptPasswordEncoder passwordEncoder;
+    @Spy private BCryptPasswordEncoder passwordEncoder;
 
     @Nested
     class create_member {
@@ -61,7 +58,7 @@ public class MemberServiceTests {
         void success() {
             // Arrange
             final SingUpDto request =
-                new SingUpDto("username-1234", "password-1234", "nickName-1234");
+                    new SingUpDto("username-1234", "password-1234", "nickName-1234");
 
             final Member member = MemberSteps.createMember();
 
@@ -71,9 +68,9 @@ public class MemberServiceTests {
 
             // Assert
             StepVerifier.create(result)
-                .expectNextMatches(
-                    memberRes -> memberRes.getUsername().equals(request.getUsername()))
-                .verifyComplete();
+                    .expectNextMatches(
+                            memberRes -> memberRes.getUsername().equals(request.getUsername()))
+                    .verifyComplete();
         }
     }
 
@@ -134,7 +131,7 @@ public class MemberServiceTests {
         // Arrange
         final String username = "username-1234";
         final MemberUpdateDto memberUpdateDto =
-            new MemberUpdateDto("username-update", "nickName-update");
+                new MemberUpdateDto("username-update", "nickName-update");
         final Member member = MemberSteps.createMember();
 
         when(memberRepository.findByUsername(anyString())).thenReturn(Mono.just(member));
@@ -145,11 +142,11 @@ public class MemberServiceTests {
 
         // Assert
         StepVerifier.create(result)
-            .expectNextMatches(
-                res ->
-                    res.getUsername().equals(memberUpdateDto.getUsername())
-                        && res.getNickName().equals(memberUpdateDto.getNickName()))
-            .verifyComplete();
+                .expectNextMatches(
+                        res ->
+                                res.getUsername().equals(memberUpdateDto.getUsername())
+                                        && res.getNickName().equals(memberUpdateDto.getNickName()))
+                .verifyComplete();
     }
 
     @Test
@@ -228,16 +225,16 @@ public class MemberServiceTests {
         when(memberRepository.findByUsername(username)).thenReturn(Mono.just(spyMember));
         when(friendRepository.findAllFriendsByMemberId(1L)).thenReturn(Flux.just(friend1, friend2));
         when(memberRepository.findAllById(anyList()))
-            .thenReturn(Flux.just(friendInfo1, friendInfo2));
+                .thenReturn(Flux.just(friendInfo1, friendInfo2));
 
         // Act
         final Flux<MemberRes> result = memberService.findAllFriend(username);
 
         // Assert
         StepVerifier.create(result)
-            .expectNextMatches(res -> res.getUsername().equals(friendInfo1.getUsername()))
-            .expectNextMatches(res -> res.getUsername().equals(friendInfo2.getUsername()))
-            .verifyComplete();
+                .expectNextMatches(res -> res.getUsername().equals(friendInfo1.getUsername()))
+                .expectNextMatches(res -> res.getUsername().equals(friendInfo2.getUsername()))
+                .verifyComplete();
     }
 
     @Test
@@ -253,7 +250,7 @@ public class MemberServiceTests {
 
         when(memberRepository.findByUsername(username)).thenReturn(Mono.just(spyMember));
         when(friendRepository.findByMemberIdAndFriendId(anyLong(), anyLong()))
-            .thenReturn(Mono.just(friend));
+                .thenReturn(Mono.just(friend));
         when(friendRepository.save(any(Friend.class))).thenReturn(Mono.just(friend));
 
         // Act

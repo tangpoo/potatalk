@@ -1,8 +1,10 @@
 package com.potatalk.subscriber;
 
 import com.potatalk.config.RedisTopicManager;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
