@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +20,11 @@ public class ChatController {
 
     @MessageMapping("/chat/message")
     public void message(@RequestBody ChatMessageDto messageDto) {
+        chatService.sendChatMessage(messageDto);
+    }
+
+    @PostMapping("/api/v1/chat/message")
+    public void messageApiTest(@RequestBody ChatMessageDto messageDto) {
         chatService.sendChatMessage(messageDto);
     }
 }

@@ -26,9 +26,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import org.springframework.web.socket.sockjs.client.SockJsClient;
-import org.springframework.web.socket.sockjs.client.Transport;
-import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -36,8 +33,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -74,9 +69,7 @@ public class ChatWebSocketTests {
     public void setup() {
         wsUrl = String.format("ws://localhost:%d/ws/chat", randomPort); // WebSocket 엔드포인트
 
-        List<Transport> transports =
-                Arrays.asList(new WebSocketTransport(new StandardWebSocketClient()));
-        stompClient = new WebSocketStompClient(new SockJsClient(transports));
+        stompClient = new WebSocketStompClient(new StandardWebSocketClient());
         MappingJackson2MessageConverter messageConverter = new MappingJackson2MessageConverter();
         ObjectMapper objectMapper = messageConverter.getObjectMapper();
         objectMapper.registerModules(new JavaTimeModule(), new ParameterNamesModule());

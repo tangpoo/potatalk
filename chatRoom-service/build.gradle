@@ -136,12 +136,19 @@ dependencyManagement {
 }
 
 dependencies {
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    // RabbitMQ
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+
+    // Tracing
+    //    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+    //    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.springframework.boot:spring-boot-starter-amqp'
-//    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-//    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-//    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+
     implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
     implementation 'com.github.jasync-sql:jasync-r2dbc-mysql:2.2.4'
 
