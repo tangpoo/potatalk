@@ -3,7 +3,6 @@ package com.potatalk.memberservice.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -12,7 +11,8 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Friend {
 
-    @Id private Long id;
+    @Id
+    private Long id;
 
     private Long memberId;
 

@@ -3,20 +3,15 @@ package com.potatalk.memberservice.config.jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-
 import jakarta.annotation.PostConstruct;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import reactor.core.publisher.Mono;
-
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
@@ -43,18 +38,18 @@ public class JwtTokenProvider {
 
     public Mono<String> createToken(String username) {
         return Mono.fromCallable(
-                () -> {
-                    Date expireDate = createExpireDate(TOKEN_TIME);
+            () -> {
+                Date expireDate = createExpireDate(TOKEN_TIME);
 
-                    return BEARER_PREFIX
-                            + Jwts.builder()
-                                    .setSubject(username)
-                                    .claim(AUTHORIZATION_KEY, null)
-                                    .setExpiration(expireDate)
-                                    .setIssuedAt(new Date())
-                                    .signWith(key, signatureAlgorithm)
-                                    .compact();
-                });
+                return BEARER_PREFIX
+                    + Jwts.builder()
+                    .setSubject(username)
+                    .claim(AUTHORIZATION_KEY, null)
+                    .setExpiration(expireDate)
+                    .setIssuedAt(new Date())
+                    .signWith(key, signatureAlgorithm)
+                    .compact();
+            });
     }
 
     private Date createExpireDate(long expireDate) {

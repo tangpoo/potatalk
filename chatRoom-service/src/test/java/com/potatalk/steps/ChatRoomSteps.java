@@ -15,7 +15,7 @@ public class ChatRoomSteps {
     }
 
     public static ChatRoom createChatRoom(
-            CreateChatRoomDto createChatRoomDto, ChatRoomStatus chatRoomStatus) {
+        CreateChatRoomDto createChatRoomDto, ChatRoomStatus chatRoomStatus) {
         return ChatRoom.create(createChatRoomDto, chatRoomStatus);
     }
 
@@ -25,7 +25,7 @@ public class ChatRoomSteps {
 
     public static ChatRoom createPrivateChatRoom() {
         return ChatRoom.create(
-                createGroupChatRoomDto(true, "secretKey-1234"), ChatRoomStatus.GROUP);
+            createGroupChatRoomDto(true, "secretKey-1234"), ChatRoomStatus.GROUP);
     }
 
     public static CreateChatRoomDto createFullParticipationChatRoomDto() {

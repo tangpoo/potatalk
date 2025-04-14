@@ -2,10 +2,8 @@ package com.potatalk.pubsub;
 
 import com.potatalk.config.RedisTopicManager;
 import com.potatalk.dto.ChatMessageDto;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;

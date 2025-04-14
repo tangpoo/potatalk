@@ -2,7 +2,6 @@ package com.potatalk.memberservice.steps;
 
 import com.potatalk.memberservice.domain.Member;
 import com.potatalk.memberservice.dto.SingUpDto;
-
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class MemberSteps {
