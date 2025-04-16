@@ -47,7 +47,8 @@ public class ChatRoomController {
     public Mono<ResponseEntity<ChatRoom>> joinChatRoom(
         @PathVariable Long roomId,
         @RequestParam Long memberId,
-        @RequestParam String secretKey) {
+        @RequestParam(required = false) String secretKey) {
+        log.info("joinChatRoom: " + roomId);
         return chatRoomService
             .joinChatRoom(roomId, memberId, secretKey)
             .map(res -> ResponseEntity.status(HttpStatus.OK).body(res));
