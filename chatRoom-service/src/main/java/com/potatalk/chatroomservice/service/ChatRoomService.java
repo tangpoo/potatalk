@@ -118,6 +118,7 @@ public class ChatRoomService {
                                     memberId,
                                     chatRoom.getId(),
                                     ParticipationStatus.JOINED)))
+                        .then(chatRoomPublisher.sendAddTopicEvent("roomId-" + chatRoom.getId()))
                         .thenReturn(chatRoom);
                 });
     }
