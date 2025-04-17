@@ -15,6 +15,17 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+  kafka:
+    bootstrap-servers: host.docker.internal:9092
+    consumer:
+      group-id: potatalk-group
+      auto-offset-reset: earliest
+
+management:
+  endpoints:
+     web:
+      exposure:
+        include: "*"
 
 logging:
   level:

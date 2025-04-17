@@ -11,14 +11,14 @@
 ## 주요 기술
 
 - 언어 : Java 17
-- 프레임워크 : Spring Boot, Spring WebFlux
+- 프레임워크 : Spring Boot, Spring WebFlux, Spring WebSocket
 - 빌드 도구 : Gradle
 - 배포 및 운영 :
     - 서버 : AWS EC2, Docker
     - CI/CD : GitHub Actions
     - 데이터베이스 : MySQL, MongoDB
     - 캐시 : Redis (AWS Elastic Cache)
-    - 메시징 시스템 : RabbitMQ
+    - 메시징 시스템 : RabbitMQ, Redis (Pub/Sub)
 - 모니터링 : Prometheus + Grafana, CloudWatch, Brave, Zipkin
 - 테스트 및 품질 : JaCoCo
 
@@ -37,6 +37,6 @@
 
 [설계 과정](https://tangpoo.tistory.com/194)
 
-Spring WebSocket 실시간 채팅 구현(todo)
+[Spring WebSocket 실시간 채팅 구현](https://tangpoo.tistory.com/196)
 
-API-Gateway 인증/인가 적용(todo)
+[API-Gateway 인증/인가 적용](https://tangpoo.tistory.com/197)
