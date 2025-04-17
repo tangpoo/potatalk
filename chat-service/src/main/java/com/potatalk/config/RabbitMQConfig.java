@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-
     public static final String EXCHANGE_NAME = "chat.join";
     public static final String QUEUE_NAME = "chat.join.queue";
 
@@ -29,10 +28,7 @@ public class RabbitMQConfig {
 
     @Bean
     public Binding chatJoinBinding() {
-        return BindingBuilder
-            .bind(chatJoinQueue())
-            .to(chatJoinExchange())
-            .with(QUEUE_NAME);
+        return BindingBuilder.bind(chatJoinQueue()).to(chatJoinExchange()).with(QUEUE_NAME);
     }
 
     @Bean

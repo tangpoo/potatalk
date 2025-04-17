@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.potatalk.dto.ChatMessageDto;
 import com.potatalk.exception.MessageSendException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,21 +20,18 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 @ExtendWith(MockitoExtension.class)
 public class ChatSubscriberImplTests {
 
-    @InjectMocks
-    private ChatSubscriberImpl chatSubscriber;
+    @InjectMocks private ChatSubscriberImpl chatSubscriber;
 
-    @Mock
-    private ObjectMapper objectMapper;
+    @Mock private ObjectMapper objectMapper;
 
-    @Mock
-    private SimpMessageSendingOperations messageTemplate;
+    @Mock private SimpMessageSendingOperations messageTemplate;
 
     @Test
     void send_message_should_send_message_to_correct_destination() throws Exception {
         // Arrange
         String message =
-            "{\"id\":\"id-1234\", \"roomId\":\"roomId-1234\", \"sender\":\"sender-1234\","
-                + " \"message\":\"Hello!\"}";
+                "{\"id\":\"id-1234\", \"roomId\":\"roomId-1234\", \"sender\":\"sender-1234\","
+                        + " \"message\":\"Hello!\"}";
         ChatMessageDto messageDto = new ChatMessageDto("roomId-1234", "sender-1234", message);
 
         when(objectMapper.readValue(message, ChatMessageDto.class)).thenReturn(messageDto);
@@ -43,7 +41,7 @@ public class ChatSubscriberImplTests {
 
         // Assert
         verify(messageTemplate, times(1))
-            .convertAndSend("/sub/chat/room/" + messageDto.getRoomId(), messageDto);
+                .convertAndSend("/sub/chat/room/" + messageDto.getRoomId(), messageDto);
     }
 
     @Test
@@ -52,11 +50,10 @@ public class ChatSubscriberImplTests {
         String invalidMessage = "Invalid JSON format";
 
         when(objectMapper.readValue(invalidMessage, ChatMessageDto.class))
-            .thenThrow(new JsonProcessingException("Invalid JSON") {
-            });
+                .thenThrow(new JsonProcessingException("Invalid JSON") {});
 
         // Act + Assert
         Assertions.assertThrows(
-            MessageSendException.class, () -> chatSubscriber.sendMessage(invalidMessage));
+                MessageSendException.class, () -> chatSubscriber.sendMessage(invalidMessage));
     }
 }
