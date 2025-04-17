@@ -2,11 +2,13 @@ package com.potatalk.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.redis.connection.DefaultMessage;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.stereotype.Component;
+
 import reactor.core.publisher.Mono;
 
 @Component
@@ -24,26 +26,26 @@ public class RedisTopicManager {
         log.info("Try Subscribe");
 
         listenerContainer
-            .receive(topic)
-            .map(message -> (String) message.getMessage())
-            .doOnSubscribe(s -> log.info("Subscribed to topic: " + topic.getTopic()))
-            .doOnNext(
-                message -> {
-                    log.info("Received message from Redis: " + message);
+                .receive(topic)
+                .map(message -> (String) message.getMessage())
+                .doOnSubscribe(s -> log.info("Subscribed to topic: " + topic.getTopic()))
+                .doOnNext(
+                        message -> {
+                            log.info("Received message from Redis: " + message);
 
-                    // 메시지를 ChatSubscriber에 전달
-                    messageListenerAdapter.onMessage(
-                        new DefaultMessage(
-                            topic.getTopic().getBytes(), message.getBytes()),
-                        null);
-                })
-            .doOnError(e -> log.error("Error while receiving Redis message", e))
-            .doOnComplete(
-                () ->
-                    log.info(
-                        "Completed receiving message from Redis: "
-                            + topic.getTopic()))
-            .subscribe(); // 구독 시작
+                            // 메시지를 ChatSubscriber에 전달
+                            messageListenerAdapter.onMessage(
+                                    new DefaultMessage(
+                                            topic.getTopic().getBytes(), message.getBytes()),
+                                    null);
+                        })
+                .doOnError(e -> log.error("Error while receiving Redis message", e))
+                .doOnComplete(
+                        () ->
+                                log.info(
+                                        "Completed receiving message from Redis: "
+                                                + topic.getTopic()))
+                .subscribe(); // 구독 시작
     }
 
     public Mono<ChannelTopic> getTopicForChatRoom(String chatRoomId) {

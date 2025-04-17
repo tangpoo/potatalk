@@ -1,5 +1,3 @@
 package com.potatalk.domain;
 
-public class ChatRoomTests {
-
-}
+public class ChatRoomTests {}
