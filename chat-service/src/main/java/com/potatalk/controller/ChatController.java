@@ -19,7 +19,8 @@ public class ChatController {
     private final ChatService chatService;
 
     @MessageMapping("/chat/message")
-    public void message(@RequestBody ChatMessageDto messageDto) {
+    public void message(ChatMessageDto messageDto) {
+        log.info(">>> Received: {}", messageDto);
         chatService.sendChatMessage(messageDto);
     }
 
