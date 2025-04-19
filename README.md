@@ -2,11 +2,12 @@
 
 ## Architecture
 
-![Pasted image 20240928004733](https://github.com/user-attachments/assets/287bf701-fd0a-4c03-95ac-84ecf64af143)
+![image](https://github.com/user-attachments/assets/ce42bc96-d5c6-43ff-aae0-b91c9ce84470)
 
 ## User Flow SnapShot
 
-![Pasted image 20240928004826](https://github.com/user-attachments/assets/a66e7596-7ab8-4dd7-a4b9-9ef4c3ea51ff)
+![image](https://github.com/user-attachments/assets/9412b2ae-b3d4-48dd-bad0-aa072f0f620f)
+
 
 ## 주요 기술
 
@@ -40,4 +41,5 @@
 [Spring WebSocket 실시간 채팅 구현](https://tangpoo.tistory.com/196)
 
 [API-Gateway 인증/인가 적용](https://tangpoo.tistory.com/197)
+
 [Kafka vs RabbitMQ 성능 비교](https://tangpoo.tistory.com/201)
