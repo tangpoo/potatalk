@@ -8,7 +8,7 @@ import com.potatalk.chatroomservice.dto.ChatRoomInfoRes;
 import com.potatalk.chatroomservice.dto.CreateChatRoomDto;
 import com.potatalk.chatroomservice.exception.ChatRoomNotFound;
 import com.potatalk.chatroomservice.exception.PrivateKeyIsNotMatchedException;
-import com.potatalk.chatroomservice.publisher.KafkaPublisherImpl;
+import com.potatalk.chatroomservice.publisher.ChatRoomPublisher;
 import com.potatalk.chatroomservice.repository.ChatRoomRepository;
 import com.potatalk.chatroomservice.repository.ParticipationRepository;
 
@@ -31,8 +31,9 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ParticipationRepository participationRepository;
     private final TransactionalOperator transactionalOperator;
-    //    private final ChatRoomPublisher chatRoomPublisher;
-    private final KafkaPublisherImpl chatRoomPublisher;
+    private final ChatRoomPublisher chatRoomPublisher;
+
+    //    private final KafkaPublisherImpl chatRoomPublisher;
 
     public Mono<ChatRoom> createChatRoom(CreateChatRoomDto createChatRoomDto) {
         Long memberId = createChatRoomDto.getMemberId();
@@ -122,6 +123,9 @@ public class ChatRoomService {
                                                             memberId,
                                                             chatRoom.getId(),
                                                             ParticipationStatus.JOINED)))
+                                    .then(
+                                            chatRoomPublisher.sendAddTopicEvent(
+                                                    "roomId-" + chatRoom.getId()))
                                     .thenReturn(chatRoom);
                         });
     }

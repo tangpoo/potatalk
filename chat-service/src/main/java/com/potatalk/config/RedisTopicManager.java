@@ -23,6 +23,7 @@ public class RedisTopicManager {
     // 해당 채널을 구독하는 메서드
     public void subscribeToTopic(String chatRoomId) {
         ChannelTopic topic = new ChannelTopic(chatRoomTopic + chatRoomId);
+        log.info("Try Subscribe");
 
         listenerContainer
                 .receive(topic)

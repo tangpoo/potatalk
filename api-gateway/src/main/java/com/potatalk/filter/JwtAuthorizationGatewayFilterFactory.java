@@ -35,7 +35,9 @@ public class JwtAuthorizationGatewayFilterFactory
             log.info("in filter");
 
             // 로그인과 회원가입 경로는 필터를 통과
-            if (path.equals("/api/v1/members/signup") || path.equals("/api/v1/members/signin")) {
+            if (path.equals("/api/v1/members/signup")
+                    || path.equals("/api/v1/members/signin")
+                    || path.equals("/api/v1/chatroom/{roomId}")) {
                 log.info("pass filter");
                 return chain.filter(exchange);
             }
