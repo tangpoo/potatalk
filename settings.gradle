@@ -2,4 +2,4 @@ include 'member-service'
 include 'chatRoom-service'
 include 'api-gateway'
 include 'chat-service'
-
+include 'call-service'

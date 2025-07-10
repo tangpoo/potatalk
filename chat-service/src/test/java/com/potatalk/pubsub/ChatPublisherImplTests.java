@@ -2,6 +2,7 @@ package com.potatalk.pubsub;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -9,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.potatalk.config.RedisTopicManager;
 import com.potatalk.dto.ChatMessageDto;
+import com.potatalk.metric.WebSocketMetrics;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +31,8 @@ public class ChatPublisherImplTests {
 
     @Mock private RedisTopicManager topicManager;
 
+    @Mock private WebSocketMetrics webSocketMetrics;
+
     @Test
     void publish_should_send_message_to_correct_topic() {
         // Arrange
@@ -38,6 +42,15 @@ public class ChatPublisherImplTests {
         when(topicManager.getTopicForChatRoom("roomId-1234")).thenReturn(Mono.just(channelTopic));
         when(redisTemplate.convertAndSend(channelTopic.getTopic(), message))
                 .thenReturn(Mono.just(1L));
+
+        doAnswer(
+                        invocation -> {
+                            Runnable runnable = invocation.getArgument(0);
+                            runnable.run();
+                            return null;
+                        })
+                .when(webSocketMetrics)
+                .recordMessage(any(Runnable.class));
 
         // Act
         chatPublisher.publish(message);

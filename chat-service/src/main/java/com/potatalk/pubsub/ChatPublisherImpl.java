@@ -22,6 +22,7 @@ public class ChatPublisherImpl implements ChatPublisher {
 
     @Override
     public void publish(final ChatMessageDto message) {
+        log.info("hello? here is pub:" + message.getRoomId());
         ChannelTopic topic = topicManager.getTopicForChatRoom(message.getRoomId()).block();
         if (topic != null) {
             webSocketMetrics.recordMessage(

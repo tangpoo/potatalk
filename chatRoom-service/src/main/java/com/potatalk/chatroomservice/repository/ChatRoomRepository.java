@@ -13,11 +13,15 @@ import reactor.core.publisher.Mono;
 public interface ChatRoomRepository extends R2dbcRepository<ChatRoom, Long> {
 
     @Query(
-            "SELECT cr FROM chat_rooms cr "
-                    + "JOIN participation p1 ON cr.id = p1.chatRoomId "
-                    + "JOIN parcitipation p2 ON cr.id = p2.chatRoomId "
-                    + "WHERE cr.chatRoomStatus = :chatRoomStatus "
-                    + "AND p1.memberId = :memberId AND p2.memberId = :friendId")
+            """
+                SELECT cr.*
+                FROM chat_rooms cr
+                JOIN participation p1 ON cr.id = p1.room_id
+                JOIN participation p2 ON cr.id = p2.room_id
+                WHERE cr.chat_room_status = :chatRoomStatus
+                  AND p1.member_id = :memberId
+                  AND p2.member_id = :friendId
+            """)
     Mono<ChatRoom> findOneToOneChatRoom(
             @Param("memberId") Long memberId,
             @Param("friendId") Long friendId,

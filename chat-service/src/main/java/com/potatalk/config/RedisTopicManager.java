@@ -11,6 +11,10 @@ import org.springframework.stereotype.Component;
 
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -19,15 +23,24 @@ public class RedisTopicManager {
     public static final String chatRoomTopic = "chatroom:";
     private final ReactiveRedisMessageListenerContainer listenerContainer;
     private final MessageListenerAdapter messageListenerAdapter;
+    private final Set<String> subscribedTopicSet = ConcurrentHashMap.newKeySet();
 
     // 해당 채널을 구독하는 메서드
     public void subscribeToTopic(String chatRoomId) {
+        log.info("hello? here is sub");
         ChannelTopic topic = new ChannelTopic(chatRoomTopic + chatRoomId);
         log.info("Try Subscribe");
 
+        String topicName = chatRoomTopic + chatRoomId;
+
+        if (!subscribedTopicSet.add(topicName)) {
+            log.info("이미 Redis에 구독된 Topic입니다: {}", topicName);
+            return;
+        }
+
         listenerContainer
                 .receive(topic)
-                .map(message -> (String) message.getMessage())
+                .map(message -> message.getMessage())
                 .doOnSubscribe(s -> log.info("Subscribed to topic: " + topic.getTopic()))
                 .doOnNext(
                         message -> {
@@ -36,7 +49,8 @@ public class RedisTopicManager {
                             // 메시지를 ChatSubscriber에 전달
                             messageListenerAdapter.onMessage(
                                     new DefaultMessage(
-                                            topic.getTopic().getBytes(), message.getBytes()),
+                                            topic.getTopic().getBytes(),
+                                            message.getBytes(StandardCharsets.UTF_8)),
                                     null);
                         })
                 .doOnError(e -> log.error("Error while receiving Redis message", e))
