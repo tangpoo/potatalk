@@ -4,7 +4,6 @@ package com.codingtest.callservice.controller;
 import com.codingtest.callservice.controller.dto.SignalMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;

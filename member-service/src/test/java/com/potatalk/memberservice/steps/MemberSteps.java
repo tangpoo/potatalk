@@ -2,12 +2,11 @@ package com.potatalk.memberservice.steps;
 
 import com.potatalk.memberservice.domain.Member;
 import com.potatalk.memberservice.dto.SingUpDto;
-
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class MemberSteps {
 
-    private static BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public static Member createMember() {
         final SingUpDto request = new SingUpDto("username-1234", "password-1234", "nickName-1234");

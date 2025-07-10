@@ -2,11 +2,9 @@ package com.potatalk.chatroomservice.domain;
 
 import com.potatalk.chatroomservice.dto.CreateChatRoomDto;
 import com.potatalk.chatroomservice.exception.MaxParticipantsExceededException;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -15,7 +13,8 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoom {
 
-    @Id private Long id;
+    @Id
+    private Long id;
 
     private Long createMemberId;
 
@@ -42,7 +41,7 @@ public class ChatRoom {
     }
 
     public static ChatRoom create(
-            final CreateChatRoomDto createChatRoomDto, ChatRoomStatus chatRoomStatus) {
+        final CreateChatRoomDto createChatRoomDto, ChatRoomStatus chatRoomStatus) {
         return new ChatRoom(createChatRoomDto, chatRoomStatus);
     }
 

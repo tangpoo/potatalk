@@ -3,10 +3,8 @@ package com.potatalk.pubsub;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.potatalk.dto.ChatMessageDto;
 import com.potatalk.exception.MessageSendException;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +22,7 @@ public class ChatSubscriberImpl implements ChatSubscriber {
             log.info("subscriber in:" + message);
             ChatMessageDto chatMessageDto = om.readValue(message, ChatMessageDto.class);
             messageTemplate.convertAndSend(
-                    "/sub/chat/room/" + chatMessageDto.getRoomId(), chatMessageDto);
+                "/sub/chat/room/" + chatMessageDto.getRoomId(), chatMessageDto);
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new MessageSendException();

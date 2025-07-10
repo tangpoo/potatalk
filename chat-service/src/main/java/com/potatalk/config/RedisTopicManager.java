@@ -37,7 +37,7 @@ public class RedisTopicManager {
 
         listenerContainer
             .receive(topic)
-            .map(message -> (String) message.getMessage())
+            .map(message -> message.getMessage())
             .doOnSubscribe(s -> log.info("Subscribed to topic: " + topic.getTopic()))
             .doOnNext(
                 message -> {
