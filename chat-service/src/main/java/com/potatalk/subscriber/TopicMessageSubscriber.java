@@ -29,6 +29,13 @@ public class TopicMessageSubscriber {
                             key = "addTopic"))
     public void processAddTopicMessage(String topic) {
         log.info("Consuming addTopic    ===>    " + topic);
-        topicManager.subscribeToTopic(topic);
+        
+        // JSON 문자열이 들어왔다면 파싱
+        try {
+            String cleaned = topic.replaceAll("^\"|\"$", ""); // 앞뒤 쌍따옴표 제거
+            topicManager.subscribeToTopic(cleaned);
+        } catch (Exception e) {
+            log.error("Failed to parse topic: " + topic, e);
+        }
     }
 }

@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/chatroom")
 @Slf4j
+@CrossOrigin(origins = "http://localhost:63342")
 public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
@@ -41,6 +43,7 @@ public class ChatRoomController {
     @PostMapping("/one_to_one")
     public Mono<ResponseEntity<ChatRoom>> creatOneToOneChatRoom(
             @RequestBody CreateChatRoomDto createChatRoomDto) {
+        log.info("hello? here is ChatRoom Controller.");
         return chatRoomService
                 .createOneToOneChatRoom(createChatRoomDto)
                 .map(res -> ResponseEntity.status(HttpStatus.CREATED).body(res));
